@@ -1,4 +1,4 @@
-import ПОКУПКИ_db as Db
+import db as Db
 
 
 def add_category(name):
