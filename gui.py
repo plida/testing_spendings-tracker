@@ -3,8 +3,8 @@ import tkinter
 from tkinter import *
 from tkinter import messagebox
 import tkinter.simpledialog as tksd
-import ПОКУПКИ_скрипт as Db_script
-import ПОКУПКИ_db as Db
+import gui_script as Db_script
+import db as Db
 from tkcalendar import Calendar
 
 def _show_info():
