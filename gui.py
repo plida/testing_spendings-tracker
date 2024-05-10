@@ -3,9 +3,10 @@ import tkinter
 from tkinter import *
 from tkinter import messagebox
 import tkinter.simpledialog as tksd
-import gui_script as Db_script
-import db as Db
+import gui_script
+import db
 from tkcalendar import Calendar
+
 
 def _show_info():
     messagebox.showinfo("Учёт собственных денежных средств", "Автор: Крестьянова Елизавета\nВерсия 2024.05.07")
@@ -117,14 +118,14 @@ class Page1:
 
     def add_spending(self):
         var_category = MyDialog(self.master)
-        Db_script.add_spending(var_category.result)
-        data = Db.Spendings.get_all()
+        gui_script.add_spending(var_category.result)
+        data = db.Spendings.get_all()
         self.fill_spendings(data)
 
     def remove_spending(self):
         var = tksd.askstring(title="Input", prompt="Enter something")
-        Db_script.remove_spending(var)
-        data = Db.Spendings.get_all()
+        gui_script.remove_spending(var)
+        data = db.Spendings.get_all()
         self.fill_spendings(data)
 
     def start_page(self):
@@ -169,14 +170,14 @@ class Page2:
 
     def add_category(self):
         var = tksd.askstring(title="Input", prompt="Enter something")
-        Db_script.add_category(var)
-        data = Db.Categories.get_all()
+        gui_script.add_category(var)
+        data = db.Categories.get_all()
         self.fill_categories(data)
 
     def remove_category(self):
         var = tksd.askstring(title="Input", prompt="Enter something")
-        Db_script.remove_category(var)
-        data = Db.Categories.get_all()
+        gui_script.remove_category(var)
+        data = db.Categories.get_all()
         self.fill_categories(data)
 
     def start_page(self):
@@ -201,7 +202,7 @@ class MyDialog(tksd.Dialog):
         Label(master, text="Дата:").grid(row=3)
 
         self.e1 = Entry(master)
-        categories = Db.Categories.get_all()
+        categories = db.Categories.get_all()
 
         self.frame_list = Frame(master)
         self.scrollbar = Scrollbar(self.frame_list, orient="vertical")

@@ -1,17 +1,17 @@
-import db as Db
+import db
 
 
 def add_category(name):
     if name:
-        Db.Categories.add(name)
+        db.Categories.add(name)
 
 
 def remove_category(name):
-    Db.Categories.remove(name)
+    db.Categories.remove(name)
 
 
 def add_spending(data):
-    Db.Spendings.add(data)
+    db.Spendings.add(data)
 
 def remove_spending(uid):
-    Db.Spendings.remove(uid)
+    db.Spendings.remove(uid)

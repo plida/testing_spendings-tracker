@@ -68,11 +68,15 @@ class Spendings(Base):
         try:
             _session = Sessions()
             print(data, len(data))
+            data[0] = data[0].lower()
             data[2] = float(data[2])
-            if data[2] > 0:
+            print(data[3], datetime.date.today())
+            if data[2] > 0 and data[3] <= datetime.date.today():
                 query = Spendings(name=data[0], category=data[1], cost=data[2], date=data[3], refunded=0)
                 _session.add(query)
                 _session.commit()
+            else:
+                print("err")
         except TypeError or IndexError or sqlalchemy.exc.StatementError as error:
             print("Ошибка при добавлении траты:", error)
 
