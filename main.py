@@ -1,7 +1,7 @@
 import datetime
 from tkinter import *
-import ПОКУПКИ_gui as Gui
-import ПОКУПКИ_db as Db
+import gui as Gui
+import db as Db
 
 root = Tk()
 app = Gui.App(root)
