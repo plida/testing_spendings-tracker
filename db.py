@@ -38,7 +38,6 @@ class Categories(Base):
             name = name.lower()
             _session = Sessions()
             x = _session.query(Categories).filter_by(name=name)
-            exists = x.first()
             x.update({"used": 0})
             _session.commit()
 
@@ -68,30 +67,62 @@ class Spendings(Base):
         try:
             _session = Sessions()
             print(data, len(data))
-            data[0] = data[0].lower()
             data[2] = float(data[2])
-            print(data[3], datetime.date.today())
-            if data[2] > 0 and data[3] <= datetime.date.today():
+            if data[2] > 0:
                 query = Spendings(name=data[0], category=data[1], cost=data[2], date=data[3], refunded=0)
                 _session.add(query)
                 _session.commit()
-            else:
-                print("err")
         except TypeError or IndexError or sqlalchemy.exc.StatementError as error:
             print("Ошибка при добавлении траты:", error)
 
     @staticmethod
     def remove(uid):
         _session = Sessions()
-        _session.query(Spendings).filter(Spendings.id == uid).delete()
+        _session.query(Spendings).filter(Spendings.id == uid).update({"refunded": 0})
         _session.commit()
 
     @staticmethod
     def get_all():
         _session = Sessions()
         data = []
-        for spending in _session.query(Spendings):
+        for spending in _session.query(Spendings).filter_by(refunded=False):
             data.append((spending.id, spending.name, spending.category, spending.cost, spending.date))
+        return data
+
+
+class Gains(Base):
+    __tablename__ = 'gains'
+    id: Mapped[int] = db.Column(db.Integer, primary_key=True)
+    name: Mapped[str]
+    money: Mapped[float]
+    date: Mapped[datetime.date]
+    deleted: Mapped[bool]
+
+    @staticmethod
+    def add(data):
+        try:
+            _session = Sessions()
+            print(data, len(data))
+            data[2] = float(data[2])
+            if data[2] > 0:
+                query = Gains(name=data[0], money=data[2], date=data[3], deleted=0)
+                _session.add(query)
+                _session.commit()
+        except TypeError or IndexError or sqlalchemy.exc.StatementError as error:
+            print("Ошибка при добавлении траты:", error)
+
+    @staticmethod
+    def remove(uid):
+        _session = Sessions()
+        _session.query(Gains).filter(Gains.id == uid).update({"deleted": 1})
+        _session.commit()
+
+    @staticmethod
+    def get_all():
+        _session = Sessions()
+        data = []
+        for gain in _session.query(Gains).filter_by(deleted=False):
+            data.append((gain.id, gain.name, gain.money, gain.date))
         return data
 
 
