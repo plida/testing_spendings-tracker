@@ -12,6 +12,28 @@ def remove_category(name):
 
 def add_spending(data):
     db.Spendings.add(data)
+    calculate_total()
+
 
 def remove_spending(uid):
     db.Spendings.remove(uid)
+    calculate_total()
+
+
+def add_gain(data):
+    db.Gains.add(data)
+
+
+def remove_gain(uid):
+    db.Gains.remove(uid)
+
+
+def calculate_total():
+    data1 = db.Spendings.get_all()
+    data2 = db.Gains.get_all()
+    sm = 0
+    for row in data1:
+        sm += row[3]
+    for row in data2:
+        sm += row[2]
+    return sm

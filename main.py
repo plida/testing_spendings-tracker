@@ -21,6 +21,7 @@ class Terminal:
     def add_spending(data):
         db.Spendings.add(data)
 
+
     @staticmethod
     def remove_spending(uid):
         db.Spendings.remove(uid)
@@ -35,8 +36,26 @@ class Terminal:
         data = db.Spendings.get_all()
         app.page1.fill_spendings(data)
 
+    @staticmethod
+    def list_gains():
+        data = db.Gains.get_all()
+        app.page3.fill_gains(data)
+
+    @staticmethod
+    def calculate_total():
+        data1 = db.Spendings.get_all()
+        data2 = db.Gains.get_all()
+        sm = 0
+        for row in data1:
+            sm -= row[3]
+        for row in data2:
+            sm += row[2]
+        app.totalVAR.set(sm)
+
 
 terminal = Terminal()
 terminal.list_categories()
 terminal.list_spendings()
+terminal.list_gains()
+terminal.calculate_total()
 root.mainloop()

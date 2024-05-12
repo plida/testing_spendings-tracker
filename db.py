@@ -66,7 +66,6 @@ class Spendings(Base):
     def add(data):
         try:
             _session = Sessions()
-            print(data, len(data))
             data[2] = float(data[2])
             if data[2] > 0:
                 query = Spendings(name=data[0], category=data[1], cost=data[2], date=data[3], refunded=0)
@@ -102,14 +101,13 @@ class Gains(Base):
     def add(data):
         try:
             _session = Sessions()
-            print(data, len(data))
-            data[2] = float(data[2])
-            if data[2] > 0:
-                query = Gains(name=data[0], money=data[2], date=data[3], deleted=0)
+            data[1] = float(data[1])
+            if data[1] > 0:
+                query = Gains(name=data[0], money=data[1], date=data[2], deleted=0)
                 _session.add(query)
                 _session.commit()
         except TypeError or IndexError or sqlalchemy.exc.StatementError as error:
-            print("Ошибка при добавлении траты:", error)
+            print("Ошибка при добавлении прибыли:", error)
 
     @staticmethod
     def remove(uid):
