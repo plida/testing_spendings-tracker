@@ -54,15 +54,6 @@ class Categories(Base):
         return data
 
     @staticmethod
-    def get_all_filter(column, filt):
-        _session = Sessions()
-        data = []
-        for category in _session.query(Categories).filter_by(used=True, column=filt):
-            data.append(category.name)
-        _session.commit()
-        return data
-
-    @staticmethod
     def get_all_filter(data):
         _session = Sessions()
         new_data = []
@@ -89,12 +80,18 @@ class Spendings(Base):
     @staticmethod
     def add(data):
         try:
-            _session = Sessions()
-            data[2] = float(data[2])
-            if data[2] > 0 and data[0] != "" and data[1] != "" and data[3]:
-                query = Spendings(name=data[0].lower(), category=data[1].lower(), cost=data[2], date=data[3], refunded=0)
-                _session.add(query)
-                _session.commit()
+            if data[0] == "" or data[1] == "" or data[2] == "" or not data[3]:
+                return
+            try:
+                data[2] = float(data[2])
+                if data[2] > 0:
+                    _session = Sessions()
+                    query = Spendings(name=data[0].lower(), category=data[1].lower(), cost=data[2], date=data[3],
+                                      refunded=0)
+                    _session.add(query)
+                    _session.commit()
+            except ValueError:
+                print("err")
         except TypeError or IndexError or sqlalchemy.exc.StatementError as error:
             print("Ошибка при добавлении траты:", error)
 
@@ -127,7 +124,8 @@ class Spendings(Base):
         if not data[3]:
             data[3] = ""
         for spending in _session.query(Spendings):
-            if ((spending.name.find(data[0]) != -1 or data[0] == "") and (spending.category == data[1] or data[1] == "") and (spending.cost == data[2] or data[2] == 0)
+            if ((spending.name.find(data[0]) != -1 or data[0] == "") and (
+                    spending.category == data[1] or data[1] == "") and (spending.cost == data[2] or data[2] == 0)
                     and (spending.date == data[3] or data[3] == "") and (spending.refunded == False)):
                 new_data.append((spending.id, spending.name, spending.category, spending.cost, spending.date))
         _session.commit()
@@ -136,8 +134,10 @@ class Spendings(Base):
     @staticmethod
     def get_all_recent():
         _session = Sessions()
-        data = _session.query(Spendings).where(datetime.date.today() < db.Spendings.date + 30)
-        print(data)
+        data = []
+        for spending in _session.query(Spendings):
+            if spending.date > datetime.date.today() - datetime.timedelta(days=30) and spending.refunded == 0:
+                data.append((spending.id, spending.name, spending.category, spending.cost, spending.date))
         _session.commit()
         return data
 
@@ -145,7 +145,7 @@ class Spendings(Base):
 class Gains(Base):
     __tablename__ = 'gains'
     id: Mapped[int] = db.Column(db.Integer, primary_key=True)
-    name: Mapped[str]
+    name: Mapped[str] = db.Column(db.String(20), nullable=False)
     money: Mapped[float]
     date: Mapped[datetime.date]
     deleted: Mapped[bool]
@@ -153,14 +153,18 @@ class Gains(Base):
     @staticmethod
     def add(data):
         try:
-            _session = Sessions()
-            data[1] = float(data[1])
-            if data[1] > 0 and data[0] != "":
-                if not data[2]:
-                    data[2] = datetime.date.today()
-                query = Gains(name=data[0].lower(), money=data[1], date=data[2], deleted=0)
-                _session.add(query)
-                _session.commit()
+            if data[0] == "" or data[1] == "" or not data[2]:
+                return
+            try:
+                data[1] = float(data[1])
+                if data[1] > 0:
+                    _session = Sessions()
+                    query = Gains(name=data[0].lower(), money=data[1], date=data[2],
+                                  deleted=0)
+                    _session.add(query)
+                    _session.commit()
+            except ValueError:
+                print("err")
         except TypeError or IndexError or ValueError or sqlalchemy.exc.StatementError as error:
             print("Ошибка при добавлении прибыли:", error)
 
@@ -200,7 +204,10 @@ class Gains(Base):
     @staticmethod
     def get_all_recent():
         _session = Sessions()
-        data = _session.query(Gains).where(datetime.date.today() < db.Gains.date + 30)
+        data = []
+        for gain in _session.query(Gains):
+            if gain.date > datetime.date.today() - datetime.timedelta(days=30) and gain.deleted == 0:
+                data.append((gain.id, gain.name, gain.money, gain.date))
         _session.commit()
         return data
 

@@ -8,10 +8,6 @@ import db
 from tkcalendar import Calendar
 
 
-def _show_info():
-    messagebox.showinfo("Учёт собственных денежных средств", "Автор: Крестьянова Елизавета\nВерсия 2024.05.07")
-
-
 class Config(Toplevel):
     def __init__(self, main):
         Toplevel.__init__(self)
@@ -65,7 +61,7 @@ class App:
 
         f_salary = Frame(f_stats)
         f_salary.grid(sticky=W, row=0, columnspan=2)
-        Label(f_salary, text="Зарплата:", font=self.sec_font).grid(row=0, column=0)
+        Label(f_salary, text="Доходы за месяц:", font=self.sec_font).grid(row=0, column=0)
         Label(f_salary, textvariable=self.salaryVAR, font=self.sec_font).grid(row=0, column=1)
 
         f_spendings = Frame(f_stats)
@@ -93,7 +89,7 @@ class App:
 
 
 class SecPage:
-    def __init__(self, master=None, app=None, dialogue_window=None, title="", dbtable=""):
+    def __init__(self, master=None, app=None, dialogue_window=None, title="", dbtable=None):
         self.master = master
         self.app = app
         self.frame = Frame(self.master)
@@ -138,6 +134,12 @@ class SecPage:
         for i in range(len(data) - 1, -1, -1):
             self.listbox.insert(END, data[i])
 
+    def remove(self):
+        pass
+
+    def add(self):
+        pass
+
 
 class SpendPage(SecPage):
     def __init__(self, master=None, app=None):
@@ -151,7 +153,12 @@ class SpendPage(SecPage):
         self.fill(data)
 
     def remove(self):
-        var = tksd.askstring(title="Input", prompt=self.asks_for)
+        selection = self.listbox.curselection()
+        if selection:
+            var = self.listbox.selection_get()
+            var = var[0:var.find(" ")]
+        else:
+            return
         gui_script.remove_spending(var)
         data = db.Spendings.get_all()
         self.fill(data)
@@ -175,7 +182,13 @@ class GainPage(SecPage):
         self.fill(data)
 
     def remove(self):
-        var = tksd.askstring(title="Input", prompt=self.asks_for)
+        selection = self.listbox.curselection()
+        if selection:
+            var = self.listbox.selection_get()
+            var = var[0:var.find(" ")]
+        else:
+            return
+        print(var)
         gui_script.remove_gain(var)
         data = db.Gains.get_all()
         self.fill(data)
@@ -199,7 +212,11 @@ class CategPage(SecPage):
         self.fill(data)
 
     def remove(self):
-        var = tksd.askstring(title="Input", prompt=self.asks_for)
+        selection = self.listbox.curselection()
+        if selection:
+            var = self.listbox.selection_get()
+        else:
+            return
         gui_script.remove_category(var)
         data = db.Categories.get_all()
         self.fill(data)
@@ -242,11 +259,14 @@ class SpendDialog(tksd.Dialog):
 
     def apply(self):
         first = self.e1.get()
-        second = self.l1.selection_get()
+        selection = self.l1.curselection()
+        if selection:
+            second = self.l1.selection_get()
+        else:
+            second = ""
         third = self.e2.get()
         fourth = self.e3.selection_get()
         self.result = [first, second, third, fourth]
-
         return self.result
 
 
@@ -274,12 +294,9 @@ class GainDialog(tksd.Dialog):
         self.result = [first, third, fourth]
 
 
-
-
 class CategDialog(tksd.Dialog):
     def body(self, master):
         Label(master, text="Название:").grid(row=0)
-
         self.e1 = Entry(master)
         self.e1.grid(row=0, column=1)
         return self.e1  # initial focus

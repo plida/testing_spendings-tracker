@@ -15,19 +15,23 @@ def remove_category(name):
 def add_spending(data):
     db.Spendings.add(data)
     calculate_total()
+    calculate_month_spend()
 
 
 def remove_spending(uid):
     db.Spendings.remove(uid)
     calculate_total()
+    calculate_month_spend()
 
 
 def add_gain(data):
     db.Gains.add(data)
+    calculate_month_gain()
 
 
 def remove_gain(uid):
     db.Gains.remove(uid)
+    calculate_month_gain()
 
 
 def calculate_total():
@@ -52,5 +56,5 @@ def calculate_month_gain():
     data1 = db.Gains.get_all_recent()
     sm = 0
     for row in data1:
-        sm += row[3]
+        sm += row[2]
     return sm
