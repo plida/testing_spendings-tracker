@@ -91,9 +91,6 @@ class App:
         self.frame.pack_forget()
         self.page3.start_page()
 
-    def open_categories_win(self):
-        self.winCateg.start()
-
 
 class Page1:
     def __init__(self, master=None, app=None):
@@ -104,11 +101,13 @@ class Page1:
         Label(self.frame, text="Траты").grid(row=0, columnspan=6)
 
         self.frame_buttons = Frame(self.frame)
-        self.frame_buttons.grid(rowspan=2, column=0)
-        self.add = Button(self.frame_buttons, text="+", command=self.add_spending)
+        self.frame_buttons.grid(rowspan=3, column=0)
+        self.add = Button(self.frame_buttons, text="+", command=self.add)
         self.add.grid(row=0, column=0)
-        self.remove = Button(self.frame_buttons, text="-", command=self.remove_spending)
+        self.remove = Button(self.frame_buttons, text="-", command=self.remove)
         self.remove.grid(row=1, column=0)
+        self.remove = Button(self.frame_buttons, text="F", command=self.filt)
+        self.remove.grid(row=2, column=0)
 
         self.frame_list = Frame(self.frame)
         self.frame_list.grid(row=1, column=1)
@@ -121,17 +120,20 @@ class Page1:
 
         Button(self.frame, text='На главную страницу', command=self.go_back).grid(row=2, columnspan=6)
 
-    def add_spending(self):
+    def add(self):
         var_category = MyDialog(self.master)
         gui_script.add_spending(var_category.result)
         data = db.Spendings.get_all()
-        self.fill_spendings(data)
+        self.fill(data)
 
-    def remove_spending(self):
+    def remove(self):
         var = tksd.askstring(title="Input", prompt="Enter something")
         gui_script.remove_spending(var)
         data = db.Spendings.get_all()
-        self.fill_spendings(data)
+        self.fill(data)
+
+    def filt(self):
+        pass
 
     def start_page(self):
         self.frame.pack()
@@ -140,10 +142,10 @@ class Page1:
         self.frame.pack_forget()
         self.app.main_page()
 
-    def fill_spendings(self, data):
+    def fill(self, data):
         self.listbox.delete(0, END)
-        for spending in data:
-            ins = [str(spending[0]), spending[1], spending[2], str(spending[3]), spending[4].strftime('%d/%m/%Y')]
+        for i in range(len(data) - 1, -1, -1):
+            ins = [str(data[i][0]), str(data[i][1]), data[i][2], str(data[i][3]), data[i][4].strftime('%d/%m/%Y')]
             self.listbox.insert(END, " ".join(ins))
 
 
@@ -156,11 +158,13 @@ class Page2:
         Label(self.frame, text="Категории").grid(row=0, columnspan=6)
 
         self.frame_buttons = Frame(self.frame)
-        self.frame_buttons.grid(rowspan=2, column=0)
-        self.add = Button(self.frame_buttons, text="+", command=self.add_category)
+        self.frame_buttons.grid(rowspan=3, column=0)
+        self.add = Button(self.frame_buttons, text="+", command=self.add)
         self.add.grid(row=0, column=0)
-        self.remove = Button(self.frame_buttons, text="-", command=self.remove_category)
+        self.remove = Button(self.frame_buttons, text="-", command=self.remove)
         self.remove.grid(row=1, column=0)
+        self.remove = Button(self.frame_buttons, text="F", command=self.filt)
+        self.remove.grid(row=2, column=0)
 
         self.frame_list = Frame(self.frame)
         self.frame_list.grid(row=1, column=1)
@@ -173,17 +177,21 @@ class Page2:
 
         Button(self.frame, text='На главную страницу', command=self.go_back).grid(row=2, columnspan=6)
 
-    def add_category(self):
+
+    def add(self):
         var = tksd.askstring(title="Input", prompt="Enter something")
         gui_script.add_category(var)
         data = db.Categories.get_all()
-        self.fill_categories(data)
+        self.fill(data)
 
-    def remove_category(self):
+    def remove(self):
         var = tksd.askstring(title="Input", prompt="Enter something")
         gui_script.remove_category(var)
         data = db.Categories.get_all()
-        self.fill_categories(data)
+        self.fill(data)
+
+    def filt(self):
+        pass
 
     def start_page(self):
         self.frame.pack()
@@ -192,10 +200,11 @@ class Page2:
         self.frame.pack_forget()
         self.app.main_page()
 
-    def fill_categories(self, data):
+    def fill(self, data):
         self.listbox.delete(0, END)
-        for category in data:
-            self.listbox.insert(END, category)
+        for i in range(len(data)-1, -1, -1):
+            self.listbox.insert(END, data[i])
+
 
 
 class Page3:
@@ -207,11 +216,15 @@ class Page3:
         Label(self.frame, text="Прибыль").grid(row=0, columnspan=6)
 
         self.frame_buttons = Frame(self.frame)
-        self.frame_buttons.grid(rowspan=2, column=0)
-        self.add = Button(self.frame_buttons, text="+", command=self.add_gain)
+        self.frame_buttons.grid(rowspan=4, column=0)
+        self.add = Button(self.frame_buttons, text="+", command=self.add)
         self.add.grid(row=0, column=0)
-        self.remove = Button(self.frame_buttons, text="-", command=self.remove_gain)
+        self.remove = Button(self.frame_buttons, text="-", command=self.remove)
         self.remove.grid(row=1, column=0)
+        self.remove = Button(self.frame_buttons, text="F", command=self.filt)
+        self.remove.grid(row=2, column=0)
+        self.list = Button(self.frame_buttons, text="L", command=self.list_all)
+        self.list.grid(row=3, column = 0)
 
         self.frame_list = Frame(self.frame)
         self.frame_list.grid(row=1, column=1)
@@ -223,18 +236,27 @@ class Page3:
         self.scrollbar.config(command=self.listbox.yview)
 
         Button(self.frame, text='На главную страницу', command=self.go_back).grid(row=2, columnspan=6)
+    def list_all(self):
+        self.fill(db.Gains.get_all())
 
-    def add_gain(self):
+    def add(self):
         var_gain = MyDialog2(self.master)
         gui_script.add_gain(var_gain.result)
         data = db.Gains.get_all()
-        self.fill_gains(data)
+        self.fill(data)
 
-    def remove_gain(self):
+    def remove(self):
         var = tksd.askstring(title="Input", prompt="Enter something")
         gui_script.remove_gain(var)
         data = db.Gains.get_all()
-        self.fill_gains(data)
+        self.fill(data)
+
+    def filt(self):
+        var_gain = MyDialog2(self.master)
+        print(var_gain)
+        data = db.Gains.get_all_filter(var_gain.result)
+        self.fill(data)
+        pass
 
     def start_page(self):
         self.frame.pack()
@@ -243,10 +265,10 @@ class Page3:
         self.frame.pack_forget()
         self.app.main_page()
 
-    def fill_gains(self, data):
+    def fill(self, data):
         self.listbox.delete(0, END)
-        for gain in data:
-            ins = [str(gain[0]), str(gain[1]), str(gain[2]), gain[3].strftime('%d/%m/%Y')]
+        for i in range(len(data)-1, -1, -1):
+            ins = [str(data[i][0]), str(data[i][1]), str(data[i][2]), data[i][3].strftime('%d/%m/%Y')]
             self.listbox.insert(END, " ".join(ins))
 
 
@@ -289,6 +311,8 @@ class MyDialog(tksd.Dialog):
         fourth = self.e3.selection_get()
         self.result = [first, second, third, fourth]
         print(self.result)
+        return self.result
+
 
 
 class MyDialog2(tksd.Dialog):
@@ -301,8 +325,7 @@ class MyDialog2(tksd.Dialog):
         self.e1 = Entry(master)
         self.e2 = Entry(master)
         self.e3 = Calendar(master, selectmode='day',
-               year=2024, month=5,
-               day=22)
+               year=datetime.date.today().year, month=datetime.date.today().month)
 
         self.e1.grid(row=0, column=1)
         self.e2.grid(row=1, column=1)

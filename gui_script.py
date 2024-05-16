@@ -1,3 +1,5 @@
+import datetime
+
 import db
 
 
@@ -36,4 +38,19 @@ def calculate_total():
         sm += row[3]
     for row in data2:
         sm += row[2]
+    return sm
+
+
+def calculate_month_spend():
+    data1 = db.Spendings.get_all_recent()
+    sm = 0
+    for row in data1:
+        sm += row[3]
+    return sm
+
+def calculate_month_gain():
+    data1 = db.Gains.get_all_recent()
+    sm = 0
+    for row in data1:
+        sm += row[3]
     return sm
