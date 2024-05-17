@@ -63,9 +63,9 @@ def calculate_month_gain():
     return sm
 
 
-def sort_data(data, ind):
+def sort(data, ind):
     try:
-        sorted(data, key=lambda student: student[ind])
+        data = sorted(data, key=lambda line: line[ind])
         return data
-    except ...:
+    except TypeError:
         return False

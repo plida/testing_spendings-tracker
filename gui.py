@@ -59,7 +59,7 @@ class App:
         Label(f_spendings, textvariable=self.spendingsVAR, font=self.sec_font).grid(row=0, column=1)
 
     def _setup_grid(self):
-        for i in range(4):
+        for i in range(10):
             self.root.rowconfigure(index=i, weight=1)
             self.root.columnconfigure(index=i, weight=1)
 
@@ -155,6 +155,7 @@ class SecPage:
 class SpendPage(SecPage):
     def __init__(self, master=None, app=None):
         self.asks_for = "Введите ID"
+        self.listbox_data = []
         super().__init__(master, app, SpendDialog, "Траты", db.Spendings)
 
     def add(self):
@@ -186,12 +187,18 @@ class SpendPage(SecPage):
         self.fill(data)
 
     def sort(self):
-        data = db.Spendings.get_all()
-        print(data)
+        var = SortSpendDialog(self.master)
+        if var.result:
+            data = gui_script.sort(self.listbox_data, var.result[0])
+            self.listbox.delete(0, END)
+            if var.result[1] == 1:
+                data.reverse()
+            self.fill(data)
 
     def fill(self, data):
         self.listbox.delete(0, END)
-        for i in range(len(data) - 1, -1, -1):
+        self.listbox_data = data
+        for i in range(len(data)):
             ins = [str(data[i][0]), str(data[i][1]), data[i][2], str(data[i][3]), data[i][4].strftime('%d/%m/%Y')]
             self.listbox.insert(END, " ".join(ins))
 
@@ -199,6 +206,7 @@ class SpendPage(SecPage):
 class GainPage(SecPage):
     def __init__(self, master=None, app=None):
         self.asks_for = "Введите ID"
+        self.listbox_data = []
         super().__init__(master, app, GainDialog, "Доходы", db.Gains)
 
     def add(self):
@@ -229,9 +237,19 @@ class GainPage(SecPage):
         data = db.Gains.get_all()
         self.fill(data)
 
+    def sort(self):
+        var = SortGainDialog(self.master)
+        if var.result:
+            data = gui_script.sort(self.listbox_data, var.result[0])
+            self.listbox.delete(0, END)
+            if var.result[1] == 1:
+                data.reverse()
+            self.fill(data)
+
     def fill(self, data):
         self.listbox.delete(0, END)
-        for i in range(len(data) - 1, -1, -1):
+        self.listbox_data = data
+        for i in range(len(data)):
             ins = [str(data[i][0]), str(data[i][1]), str(data[i][2]), data[i][3].strftime('%d/%m/%Y')]
             self.listbox.insert(END, " ".join(ins))
 
@@ -239,6 +257,7 @@ class GainPage(SecPage):
 class CategPage(SecPage):
     def __init__(self, master=None, app=None):
         self.asks_for = "Введите название категории"
+        self.listbox_data = []
         super().__init__(master, app, CategDialog, "Категории", db.Categories)
         self.listbox.config(width=15)
 
@@ -268,9 +287,20 @@ class CategPage(SecPage):
         data = db.Categories.get_all()
         self.fill(data)
 
+    def sort(self):
+        var = SortCategDialog(self.master)
+        data = self.listbox_data
+        self.listbox.delete(0, END)
+        if var.result == 0:
+            data = sorted(data)
+        if var.result == 1:
+            data = sorted(data, reverse=True)
+        self.fill(data)
+
     def fill(self, data):
         self.listbox.delete(0, END)
-        for i in range(len(data) - 1, -1, -1):
+        self.listbox_data = data
+        for i in range(len(data)):
             self.listbox.insert(END, data[i])
 
 
@@ -359,5 +389,80 @@ class CategDialog(tksd.Dialog):
         self.result = first
 
 
+class SortSpendDialog(tksd.Dialog):
+    def body(self, master):
+        Label(master, text="Отсортировать:").grid(row=0)
+        self.frame1 = Frame(master)
+        self.frame1.grid(row=1, rowspan=5, column=0)
+        self.radio_var1 = IntVar()
+        Radiobutton(self.frame1, text='По ID', variable=self.radio_var1, value=0, command=self.selection1).grid(row=0)
+        Radiobutton(self.frame1, text='По названию', variable=self.radio_var1, value=1, command=self.selection1).grid(row=1)
+        Radiobutton(self.frame1, text='По категории', variable=self.radio_var1, value=2, command=self.selection1).grid(row=2)
+        Radiobutton(self.frame1, text='По стоимости', variable=self.radio_var1, value=3, command=self.selection1).grid(row=3)
+        Radiobutton(self.frame1, text='По дате', variable=self.radio_var1, value=4, command=self.selection1).grid(row=4)
+        self.frame2 = Frame(master)
+        self.frame2.grid(row=1, rowspan=2, column=1)
+        self.radio_var2 = IntVar()
+        Radiobutton(self.frame2, text='A-Я', variable=self.radio_var2, value=0, command=self.selection2).grid(row=0)
+        Radiobutton(self.frame2, text='Я-A', variable=self.radio_var2, value=1, command=self.selection2).grid(row=1)
+        self.radio_var1.set(0)
+        self.radio_var2.set(0)
+        self.result1 = self.radio_var1.get()
+        self.result2 = self.radio_var2.get()
+
+    def selection1(self):
+        self.result1 = self.radio_var1.get()
+
+    def selection2(self):
+        self.result2 = self.radio_var2.get()
+
+    def apply(self):
+        self.result = (self.result1, self.result2)
 
 
+class SortGainDialog(tksd.Dialog):
+    def body(self, master):
+        Label(master, text="Отсортировать:").grid(row=0)
+        self.frame1 = Frame(master)
+        self.frame1.grid(row=1, rowspan=4, column=0)
+        self.radio_var1 = IntVar()
+        Radiobutton(self.frame1, text='По ID', variable=self.radio_var1, value=0, command=self.selection1).grid(row=0)
+        Radiobutton(self.frame1, text='По названию', variable=self.radio_var1, value=1, command=self.selection1).grid(row=1)
+        Radiobutton(self.frame1, text='По стоимости', variable=self.radio_var1, value=2, command=self.selection1).grid(row=2)
+        Radiobutton(self.frame1, text='По дате', variable=self.radio_var1, value=3, command=self.selection1).grid(row=3)
+        self.frame2 = Frame(master)
+        self.frame2.grid(row=1, rowspan=2, column=1)
+        self.radio_var2 = IntVar()
+        Radiobutton(self.frame2, text='A-Я', variable=self.radio_var2, value=0, command=self.selection2).grid(row=0)
+        Radiobutton(self.frame2, text='Я-A', variable=self.radio_var2, value=1, command=self.selection2).grid(row=1)
+        self.radio_var1.set(0)
+        self.radio_var2.set(0)
+        self.result1 = self.radio_var1.get()
+        self.result2 = self.radio_var2.get()
+
+    def selection1(self):
+        self.result1 = self.radio_var1.get()
+
+    def selection2(self):
+        self.result2 = self.radio_var2.get()
+
+    def apply(self):
+        self.result = (self.result1, self.result2)
+
+
+class SortCategDialog(tksd.Dialog):
+    def body(self, master):
+        Label(master, text="Отсортировать:").grid(row=0)
+        self.frame = Frame(master)
+        self.frame.grid(row=1, rowspan=4, column=0)
+        self.radio_var = IntVar()
+        Radiobutton(self.frame, text='A-Я', variable=self.radio_var, value=0, command=self.selection).grid(row=0)
+        Radiobutton(self.frame, text='Я-A', variable=self.radio_var, value=1, command=self.selection).grid(row=1)
+        self.radio_var.set(0)
+        self.result = self.radio_var.get()
+
+    def selection(self):
+        self.result = self.radio_var.get()
+
+    def apply(self):
+        self.result = self.radio_var.get()
