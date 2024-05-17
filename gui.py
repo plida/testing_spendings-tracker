@@ -5,8 +5,10 @@ import tkinter.simpledialog as tksd
 import gui_script
 import db
 from tkcalendar import Calendar
+
 month_list = ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь',
-           'июлЬ', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь']
+              'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь']
+
 
 class App:
     def __init__(self, root=None):
@@ -17,6 +19,9 @@ class App:
         self.root.title("Учёт собственных средств")
         self.main_font = ("Calibri", 30)
         self.sec_font = ("Calibri", 15)
+        self.totalVAR = DoubleVar()
+        self.gainsVAR = DoubleVar()
+        self.spendingsVAR = DoubleVar()
         self._setup_grid()
         self._setup_menu()
         # рамка, в которую помещается главная страничка
@@ -30,18 +35,17 @@ class App:
         self.page2 = GainPage(master=self.root, app=self)
         self.page3 = CategPage(master=self.root, app=self)
 
-        self.totalVAR = DoubleVar()
-        self.gainsVAR = DoubleVar()
-        self.spendingsVAR = DoubleVar()
-
         Label(self.frame, text='Баланс: ', font=self.main_font).grid(row=0, column=0, sticky=W, ipady=30)
 
         self._setup_labels()
         self.button_frame = Frame(self.frame)
         self.button_frame.grid(row=3, columnspan=3, sticky=W, pady=5)
-        Button(self.button_frame, text='К тратам', command=lambda: self.make_page(self.page1), width=15).grid(row=3, column=0, padx=5)
-        Button(self.button_frame, text='К доходам', command=lambda: self.make_page(self.page2), width=15).grid(row=3, column=1, padx=5)
-        Button(self.button_frame, text='К категориям', command=lambda: self.make_page(self.page3), width=15).grid(row=3, column=2, padx=5)
+        Button(self.button_frame, text='К тратам', command=lambda: self.make_page(self.page1), width=15) \
+            .grid(row=3, column=0, padx=5)
+        Button(self.button_frame, text='К доходам', command=lambda: self.make_page(self.page2), width=15) \
+            .grid(row=3, column=1, padx=5)
+        Button(self.button_frame, text='К категориям', command=lambda: self.make_page(self.page3), width=15) \
+            .grid(row=3, column=2, padx=5)
 
     def _setup_labels(self):
         Label(self.frame, textvariable=self.totalVAR, font=self.main_font).grid(row=0, column=1)
@@ -50,12 +54,14 @@ class App:
 
         f_gains = Frame(f_stats)
         f_gains.grid(sticky=W, row=0, columnspan=2)
-        Label(f_gains, text=f"Доходы за месяц {month_list[datetime.date.today().month - 1]}:", font=self.sec_font).grid(row=0, column=0)
+        Label(f_gains, text=f"Доходы за месяц {month_list[datetime.date.today().month - 1]}:", font=self.sec_font).grid(
+            row=0, column=0)
         Label(f_gains, textvariable=self.gainsVAR, font=self.sec_font).grid(row=0, column=1)
 
         f_spendings = Frame(f_stats)
         f_spendings.grid(sticky=W, row=1, columnspan=2)
-        Label(f_spendings, text=f"Траты за месяц {month_list[datetime.date.today().month - 1]}:", font=self.sec_font).grid(row=0, column=0)
+        Label(f_spendings, text=f"Траты за месяц {month_list[datetime.date.today().month - 1]}:",
+              font=self.sec_font).grid(row=0, column=0)
         Label(f_spendings, textvariable=self.spendingsVAR, font=self.sec_font).grid(row=0, column=1)
 
     def _setup_grid(self):
@@ -161,19 +167,24 @@ class SpendPage(SecPage):
     def add(self):
         var_spending = self.Dialogue(self.master)
         result = gui_script.add_spending(var_spending.result)
-        if result == True:
-            data = db.Spendings.get_all()
-            self.fill(data)
-        elif result == "EXIT":
+        if result == "EXIT":
             return
+        elif result == "ERR_future":
+            messagebox.showerror("Ошибка (доходы)", "Нельзя вводить будущую дату!")
         elif result == "ERR_empty":
             messagebox.showerror("Ошибка (траты)", "Строки не должны быть пустыми!")
         elif result == "ERR_value":
             messagebox.showerror("Ошибка (траты)", "Стоимость должна быть положительным числом меньше 10^9!")
         elif result == "ERR_toolong":
             messagebox.showerror("Ошибка (траты)", "Название траты слишком длинное!")
+        elif result:
+            data = db.Spendings.get_all()
+            self.fill(data)
         elif not result:
             messagebox.showerror("Ошибка (траты)", "Ошибка при добавлении траты!")
+        self.app.spendingsVAR.set(gui_script.calculate_month_spend())
+        self.app.gainsVAR.set(gui_script.calculate_month_gain())
+        self.app.totalVAR.set(gui_script.calculate_total())
 
     def remove(self):
         selection = self.listbox.curselection()
@@ -185,11 +196,16 @@ class SpendPage(SecPage):
         gui_script.remove_spending(var)
         data = db.Spendings.get_all()
         self.fill(data)
+        self.app.spendingsVAR.set(gui_script.calculate_month_spend())
+        self.app.gainsVAR.set(gui_script.calculate_month_gain())
+        self.app.totalVAR.set(gui_script.calculate_total())
 
     def sort(self):
         var = SortSpendDialog(self.master)
+        print(var.result)
         if var.result:
             data = gui_script.sort(self.listbox_data, var.result[0])
+            print(data, var.result[0])
             self.listbox.delete(0, END)
             if var.result[1] == 1:
                 data.reverse()
@@ -212,19 +228,24 @@ class GainPage(SecPage):
     def add(self):
         var_gain = self.Dialogue(self.master)
         result = gui_script.add_gain(var_gain.result)
-        if result == True:
-            data = db.Gains.get_all()
-            self.fill(data)
-        elif result == "EXIT":
+        if result == "EXIT":
             return
+        elif result == "ERR_future":
+            messagebox.showerror("Ошибка (доходы)", "Нельзя вводить будущую дату!")
         elif result == "ERR_empty":
             messagebox.showerror("Ошибка (доходы)", "Строки не должны быть пустыми!")
         elif result == "ERR_value":
             messagebox.showerror("Ошибка (доходы)", "Стоимость должна быть положительным числом меньше 10^9!")
         elif result == "ERR_toolong":
             messagebox.showerror("Ошибка (доходы) ", "Название дохода слишком длинное!")
+        if result:
+            data = db.Gains.get_all()
+            self.fill(data)
         elif not result:
             messagebox.showerror("Ошибка (доходы)", "Ошибка при добавлении дохода!")
+        self.app.spendingsVAR.set(gui_script.calculate_month_spend())
+        self.app.gainsVAR.set(gui_script.calculate_month_gain())
+        self.app.totalVAR.set(gui_script.calculate_total())
 
     def remove(self):
         selection = self.listbox.curselection()
@@ -236,6 +257,9 @@ class GainPage(SecPage):
         gui_script.remove_gain(var)
         data = db.Gains.get_all()
         self.fill(data)
+        self.app.spendingsVAR.set(gui_script.calculate_month_spend())
+        self.app.gainsVAR.set(gui_script.calculate_month_gain())
+        self.app.totalVAR.set(gui_script.calculate_total())
 
     def sort(self):
         var = SortGainDialog(self.master)
@@ -259,20 +283,21 @@ class CategPage(SecPage):
         self.asks_for = "Введите название категории"
         self.listbox_data = []
         super().__init__(master, app, CategDialog, "Категории", db.Categories)
-        self.listbox.config(width=15)
+        self.listbox.config(width=20)
 
     def add(self):
         var_category = self.Dialogue(self.master)
-        result =  gui_script.add_category(var_category.result)
-        if result == True:
-            data = db.Categories.get_all()
-            self.fill(data)
-        elif result == "ERR_exists":
+        result = gui_script.add_category(var_category.result)
+        print(result)
+        if result == "ERR_exists":
             messagebox.showinfo("Ошибка (категории)", "Категория уже существует.")
-        elif result == "ERR_toolong":
+        elif result == "ERR_too_long":
             messagebox.showerror("Ошибка (категории)", "Слишком длинное имя категории!")
         elif result == "EXIT":
             return
+        if result:
+            data = db.Categories.get_all()
+            self.fill(data)
         else:
             messagebox.showerror("Ошибка (категории)", "Ошибка при добавлении категории...")
 
@@ -396,9 +421,12 @@ class SortSpendDialog(tksd.Dialog):
         self.frame1.grid(row=1, rowspan=5, column=0)
         self.radio_var1 = IntVar()
         Radiobutton(self.frame1, text='По ID', variable=self.radio_var1, value=0, command=self.selection1).grid(row=0)
-        Radiobutton(self.frame1, text='По названию', variable=self.radio_var1, value=1, command=self.selection1).grid(row=1)
-        Radiobutton(self.frame1, text='По категории', variable=self.radio_var1, value=2, command=self.selection1).grid(row=2)
-        Radiobutton(self.frame1, text='По стоимости', variable=self.radio_var1, value=3, command=self.selection1).grid(row=3)
+        Radiobutton(self.frame1, text='По названию', variable=self.radio_var1, value=1, command=self.selection1).grid(
+            row=1)
+        Radiobutton(self.frame1, text='По категории', variable=self.radio_var1, value=2, command=self.selection1).grid(
+            row=2)
+        Radiobutton(self.frame1, text='По стоимости', variable=self.radio_var1, value=3, command=self.selection1).grid(
+            row=3)
         Radiobutton(self.frame1, text='По дате', variable=self.radio_var1, value=4, command=self.selection1).grid(row=4)
         self.frame2 = Frame(master)
         self.frame2.grid(row=1, rowspan=2, column=1)
@@ -427,8 +455,10 @@ class SortGainDialog(tksd.Dialog):
         self.frame1.grid(row=1, rowspan=4, column=0)
         self.radio_var1 = IntVar()
         Radiobutton(self.frame1, text='По ID', variable=self.radio_var1, value=0, command=self.selection1).grid(row=0)
-        Radiobutton(self.frame1, text='По названию', variable=self.radio_var1, value=1, command=self.selection1).grid(row=1)
-        Radiobutton(self.frame1, text='По стоимости', variable=self.radio_var1, value=2, command=self.selection1).grid(row=2)
+        Radiobutton(self.frame1, text='По названию', variable=self.radio_var1, value=1, command=self.selection1).grid(
+            row=1)
+        Radiobutton(self.frame1, text='По стоимости', variable=self.radio_var1, value=2, command=self.selection1).grid(
+            row=2)
         Radiobutton(self.frame1, text='По дате', variable=self.radio_var1, value=3, command=self.selection1).grid(row=3)
         self.frame2 = Frame(master)
         self.frame2.grid(row=1, rowspan=2, column=1)

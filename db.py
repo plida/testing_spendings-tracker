@@ -4,6 +4,7 @@ import sqlalchemy.exc
 from sqlalchemy.orm import sessionmaker, DeclarativeBase, Mapped
 from calendar import monthrange
 
+
 class Base(DeclarativeBase):
     pass
 
@@ -87,13 +88,15 @@ class Spendings(Base):
     @staticmethod
     def add(data):
         try:
-            if data[0] == "" and data[1] == "" and data[2] == "" and not data[3]:
+            if not data or data[0] == "" and data[1] == "" and data[2] == "" and not data[3]:
                 return "EXIT"
             if data[0] == "" or data[1] == "" or data[2] == "" or not data[3]:
                 return "ERR_empty"
             if len(data[0]) > 15:
                 return "ERR_toolong"
             try:
+                if data[3] > datetime.date.today():
+                    return "ERR_future"
                 data[2] = float(data[2])
                 if 0 < data[2] < 10**9:
                     _session = Sessions()
@@ -139,7 +142,7 @@ class Spendings(Base):
         for spending in _session.query(Spendings):
             if ((spending.name.find(data[0]) != -1 or data[0] == "") and (
                     spending.category == data[1] or data[1] == "") and (spending.cost == data[2] or data[2] == 0)
-                    and (spending.date == data[3] or data[3] == "") and (spending.refunded == False)):
+                    and (spending.date == data[3] or data[3] == "") and (not spending.refunded)):
                 new_data.append((spending.id, spending.name, spending.category, spending.cost, spending.date))
         _session.commit()
         return new_data
@@ -173,6 +176,8 @@ class Gains(Base):
             if len(data[0]) > 15:
                 return "ERR_toolong"
             try:
+                if data[2] > datetime.date.today():
+                    return "ERR_future"
                 data[1] = float(data[1])
                 if 0 < data[1] < 10**9:
                     _session = Sessions()
@@ -224,7 +229,7 @@ class Gains(Base):
 
         for gain in _session.query(Gains):
             if ((gain.name.find(data[0]) != -1 or data[0] == "") and (gain.money == data[1] or data[1] == 0)
-                    and (gain.date == data[2] or data[2] == "") and (gain.deleted == False)):
+                    and (gain.date == data[2] or data[2] == "") and (not gain.deleted)):
                 new_data.append((gain.id, gain.name, gain.money, gain.date))
         _session.commit()
         return new_data

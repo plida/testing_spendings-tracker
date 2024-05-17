@@ -1,5 +1,3 @@
-import datetime
-
 import db
 
 
@@ -41,7 +39,7 @@ def calculate_total():
     data2 = db.Gains.get_all()
     sm = 0
     for row in data1:
-        sm += row[3]
+        sm -= row[3]
     for row in data2:
         sm += row[2]
     return sm
