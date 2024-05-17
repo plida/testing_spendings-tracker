@@ -2,7 +2,7 @@ import datetime
 import sqlalchemy as db
 import sqlalchemy.exc
 from sqlalchemy.orm import sessionmaker, DeclarativeBase, Mapped
-
+from calendar import monthrange
 
 class Base(DeclarativeBase):
     pass
@@ -11,26 +11,33 @@ class Base(DeclarativeBase):
 class Categories(Base):
     __tablename__ = 'categories'
 
-    name: Mapped[str] = db.Column(db.String, primary_key=True)
+    name: Mapped[str] = db.Column(db.String(), primary_key=True)
     used: Mapped[bool]
 
     @staticmethod
     def add(name):
         try:
-            name = name.lower()
+            if not name:
+                return "EXIT"
+            name = str(name).lower()
+            if len(name) > 15:
+                return "ERR_too_long"
             _session = Sessions()
             x = _session.query(Categories).filter_by(name=name)
             exists = x.first()
             if exists:
-                print(f"Категория {name} уже существует.")
-                x.update({"used": 1})
-                _session.commit()
-                return
+                if exists.used == 0:
+                    x.update({"used": 1})
+                    _session.commit()
+                    return True
+                else:
+                    return "ERR_exists"
             query = Categories(name=name, used=True)
             _session.add(query)
             _session.commit()
-        except TypeError or sqlalchemy.exc.StatementError as error:
-            print("Ошибка при добавлении категории:", error)
+            return True
+        except TypeError or sqlalchemy.exc.StatementError:
+            return False
 
     @staticmethod
     def remove(name):
@@ -57,7 +64,7 @@ class Categories(Base):
     def get_all_filter(data):
         _session = Sessions()
         new_data = []
-        if data == "":
+        if not data or data == "":
             new_data = Categories.get_all()
             return new_data
 
@@ -80,20 +87,26 @@ class Spendings(Base):
     @staticmethod
     def add(data):
         try:
+            if data[0] == "" and data[1] == "" and data[2] == "" and not data[3]:
+                return "EXIT"
             if data[0] == "" or data[1] == "" or data[2] == "" or not data[3]:
-                return
+                return "ERR_empty"
+            if len(data[0]) > 15:
+                return "ERR_toolong"
             try:
                 data[2] = float(data[2])
-                if data[2] > 0:
+                if 0 < data[2] < 10**9:
                     _session = Sessions()
                     query = Spendings(name=data[0].lower(), category=data[1].lower(), cost=data[2], date=data[3],
                                       refunded=0)
                     _session.add(query)
                     _session.commit()
+                    return True
+                return "ERR_value"
             except ValueError:
-                print("err")
-        except TypeError or IndexError or sqlalchemy.exc.StatementError as error:
-            print("Ошибка при добавлении траты:", error)
+                return "ERR_value"
+        except TypeError or IndexError or sqlalchemy.exc.StatementError:
+            return False
 
     @staticmethod
     def remove(uid):
@@ -114,7 +127,7 @@ class Spendings(Base):
     def get_all_filter(data):
         _session = Sessions()
         new_data = []
-        if data[0] == "" and not data[1] and not data[2] and not data[3]:
+        if not data or (not data[0] or data[0] == "") and not data[1] and not data[2]:
             new_data = Spendings.get_all()
             return new_data
         if not data[1]:
@@ -153,20 +166,27 @@ class Gains(Base):
     @staticmethod
     def add(data):
         try:
+            if data[0] == "" and data[1] == "" and not data[2]:
+                return "EXIT"
             if data[0] == "" or data[1] == "" or not data[2]:
-                return
+                return "ERR_empty"
+            if len(data[0]) > 15:
+                return "ERR_toolong"
             try:
                 data[1] = float(data[1])
-                if data[1] > 0:
+                if 0 < data[1] < 10**9:
                     _session = Sessions()
                     query = Gains(name=data[0].lower(), money=data[1], date=data[2],
                                   deleted=0)
                     _session.add(query)
                     _session.commit()
+                    return True
+                else:
+                    return "ERR_value"
             except ValueError:
-                print("err")
-        except TypeError or IndexError or ValueError or sqlalchemy.exc.StatementError as error:
-            print("Ошибка при добавлении прибыли:", error)
+                return "ERR_value"
+        except TypeError or IndexError or ValueError or sqlalchemy.exc.StatementError:
+            return False
 
     @staticmethod
     def remove(uid):
@@ -187,13 +207,21 @@ class Gains(Base):
     def get_all_filter(data):
         _session = Sessions()
         new_data = []
-        if data[0] == "" and not data[1] and not data[2]:
+        if not data or (not data[0] or data[0] == "") and not data[1] and not data[2]:
             new_data = Gains.get_all()
             return new_data
+        if not data[0]:
+            data[0] = ""
         if not data[1]:
             data[1] = 0
+        else:
+            try:
+                data[1] = float(data[1])
+            except TypeError:
+                return
         if not data[2]:
             data[2] = ""
+
         for gain in _session.query(Gains):
             if ((gain.name.find(data[0]) != -1 or data[0] == "") and (gain.money == data[1] or data[1] == 0)
                     and (gain.date == data[2] or data[2] == "") and (gain.deleted == False)):
@@ -206,7 +234,10 @@ class Gains(Base):
         _session = Sessions()
         data = []
         for gain in _session.query(Gains):
-            if gain.date > datetime.date.today() - datetime.timedelta(days=30) and gain.deleted == 0:
+            today = datetime.date.today()
+            date1 = today - datetime.timedelta(today.day)
+            date2 = today + datetime.timedelta(monthrange(today.year, today.month)[1] - today.day + 1)
+            if date1 < gain.date < date2 and gain.deleted == 0:
                 data.append((gain.id, gain.name, gain.money, gain.date))
         _session.commit()
         return data

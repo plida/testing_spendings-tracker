@@ -4,8 +4,8 @@ import db
 
 
 def add_category(name):
-    if name:
-        db.Categories.add(name)
+    result = db.Categories.add(name)
+    return result
 
 
 def remove_category(name):
@@ -13,9 +13,10 @@ def remove_category(name):
 
 
 def add_spending(data):
-    db.Spendings.add(data)
+    result = db.Spendings.add(data)
     calculate_total()
     calculate_month_spend()
+    return result
 
 
 def remove_spending(uid):
@@ -25,8 +26,9 @@ def remove_spending(uid):
 
 
 def add_gain(data):
-    db.Gains.add(data)
+    result = db.Gains.add(data)
     calculate_month_gain()
+    return result
 
 
 def remove_gain(uid):
@@ -52,9 +54,18 @@ def calculate_month_spend():
         sm += row[3]
     return sm
 
+
 def calculate_month_gain():
     data1 = db.Gains.get_all_recent()
     sm = 0
     for row in data1:
         sm += row[2]
     return sm
+
+
+def sort_data(data, ind):
+    try:
+        sorted(data, key=lambda student: student[ind])
+        return data
+    except ...:
+        return False
