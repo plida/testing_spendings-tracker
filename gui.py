@@ -13,10 +13,10 @@ month_list = ['январь', 'февраль', 'март', 'апрель', 'м�
 class App:
     def __init__(self, root=None):
         # параметры приложения
-        self.root = root
-        self.root.minsize(600, 300)
-        self.root.maxsize(600, 300)
-        self.root.title("Учёт собственных средств")
+        self._root = root
+        self._root.minsize(600, 300)
+        self._root.maxsize(600, 300)
+        self._root.title("Учёт собственных средств")
         self.main_font = ("Calibri", 30)
         self.sec_font = ("Calibri", 15)
         self.totalVAR = DoubleVar()
@@ -25,20 +25,20 @@ class App:
         self._setup_grid()
         self._setup_menu()
         # рамка, в которую помещается главная страничка
-        self.frame = Frame(self.root)
-        self.frame.pack()
+        self._frame = Frame(self._root)
+        self._frame.pack()
         # главная страничка
         self._setup_main_page()
 
     def _setup_main_page(self):
-        self.page1 = SpendPage(master=self.root, app=self)
-        self.page2 = GainPage(master=self.root, app=self)
-        self.page3 = CategPage(master=self.root, app=self)
+        self.page1 = SpendPage(master=self._root, app=self)
+        self.page2 = GainPage(master=self._root, app=self)
+        self.page3 = CategPage(master=self._root, app=self)
 
-        Label(self.frame, text='Баланс: ', font=self.main_font).grid(row=0, column=0, sticky=W, ipady=30)
+        Label(self._frame, text='Баланс: ', font=self.main_font).grid(row=0, column=0, sticky=W, ipady=30)
 
         self._setup_labels()
-        self.button_frame = Frame(self.frame)
+        self.button_frame = Frame(self._frame)
         self.button_frame.grid(row=3, columnspan=3, sticky=W, pady=5)
         Button(self.button_frame, text='К тратам', command=lambda: self.make_page(self.page1), width=15) \
             .grid(row=3, column=0, padx=5)
@@ -48,29 +48,29 @@ class App:
             .grid(row=3, column=2, padx=5)
 
     def _setup_labels(self):
-        Label(self.frame, textvariable=self.totalVAR, font=self.main_font).grid(row=0, column=1)
-        f_stats = Frame(self.frame)
-        f_stats.grid(sticky=NW, rowspan=2, columnspan=2, pady=20)
+        Label(self._frame, textvariable=self.totalVAR, font=self.main_font).grid(row=0, column=1)
+        _f_stats = Frame(self._frame)
+        _f_stats.grid(sticky=NW, rowspan=2, columnspan=2, pady=20)
 
-        f_gains = Frame(f_stats)
+        f_gains = Frame(_f_stats)
         f_gains.grid(sticky=W, row=0, columnspan=2)
         Label(f_gains, text=f"Доходы за месяц {month_list[datetime.date.today().month - 1]}:", font=self.sec_font).grid(
             row=0, column=0)
         Label(f_gains, textvariable=self.gainsVAR, font=self.sec_font).grid(row=0, column=1)
 
-        f_spendings = Frame(f_stats)
-        f_spendings.grid(sticky=W, row=1, columnspan=2)
-        Label(f_spendings, text=f"Траты за месяц {month_list[datetime.date.today().month - 1]}:",
+        _f_spendings = Frame(_f_stats)
+        _f_spendings.grid(sticky=W, row=1, columnspan=2)
+        Label(_f_spendings, text=f"Траты за месяц {month_list[datetime.date.today().month - 1]}:",
               font=self.sec_font).grid(row=0, column=0)
-        Label(f_spendings, textvariable=self.spendingsVAR, font=self.sec_font).grid(row=0, column=1)
+        Label(_f_spendings, textvariable=self.spendingsVAR, font=self.sec_font).grid(row=0, column=1)
 
     def _setup_grid(self):
         for i in range(10):
-            self.root.rowconfigure(index=i, weight=1)
-            self.root.columnconfigure(index=i, weight=1)
+            self._root.rowconfigure(index=i, weight=1)
+            self._root.columnconfigure(index=i, weight=1)
 
     def _setup_menu(self):
-        self.root.option_add("*tearOff", FALSE)
+        self._root.option_add("*tearOff", FALSE)
         # подменю "файл"
         file_menu = Menu()
         file_menu.add_command(label="Выйти", command=self._exit_app)
@@ -78,55 +78,55 @@ class App:
         main_menu = Menu()
         main_menu.add_cascade(label="Файл", menu=file_menu)
         main_menu.add_command(label="Справка", command=self._show_info)
-        self.root.config(menu=main_menu)
+        self._root.config(menu=main_menu)
 
     @staticmethod
     def _show_info():
         messagebox.showinfo("Учёт собственных денежных средств", "Автор: Крестьянова Елизавета\nВерсия 2024.05.17")
 
     def _exit_app(self):
-        self.root.destroy()
+        self._root.destroy()
 
     def main_page(self):
-        self.frame.pack()
+        self._frame.pack()
 
     def make_page(self, page):  # переключить на другие страницы
-        self.frame.pack_forget()
+        self._frame.pack_forget()
         page.start_page()
 
 
 class SecPage:
-    def __init__(self, master=None, app=None, dialogue_window=None, title="", dbtable=None):
+    def __init__(self, master=None, app=None, dialogue_window=None, title="", _dbtable=None):
         self.main_font = ("Calibri", 15)
         self.sec_font = ("Calibri", 10)
         self.master = master
         self.app = app
-        self.frame = Frame(self.master)
-        self.Dialogue = dialogue_window
-        self.dbtable = dbtable
-        Label(self.frame, text=title, font=self.main_font).grid(row=0, columnspan=6)
+        self._frame = Frame(self.master)
+        self._dialogue = dialogue_window
+        self._dbtable = _dbtable
+        Label(self._frame, text=title, font=self.main_font).grid(row=0, columnspan=6)
         self._setup_buttons()
         self._setup_listbox()
 
     def _setup_buttons(self):
-        self.frame_buttons = Frame(self.frame)
-        self.frame_buttons.grid(row=1, rowspan=4, column=0, sticky=NW, padx=10)
-        self.add = Button(self.frame_buttons, text="+", command=self.add, width=2, font=self.sec_font)
+        self._frame_buttons = Frame(self._frame)
+        self._frame_buttons.grid(row=1, rowspan=4, column=0, sticky=NW, padx=10)
+        self.add = Button(self._frame_buttons, text="+", command=self.add, width=2, font=self.sec_font)
         self.add.grid(row=0, column=0, ipady=3, pady=3, sticky=N)
-        self.remove = Button(self.frame_buttons, text="-", command=self.remove, width=2, font=self.sec_font)
+        self.remove = Button(self._frame_buttons, text="-", command=self.remove, width=2, font=self.sec_font)
         self.remove.grid(row=1, column=0, ipady=3, pady=3)
-        self.remove = Button(self.frame_buttons, text="Ф", command=self.filt, width=2, font=self.sec_font)
+        self.remove = Button(self._frame_buttons, text="Ф", command=self.filt, width=2, font=self.sec_font)
         self.remove.grid(row=2, column=0, ipady=3, pady=3)
-        self.remove = Button(self.frame_buttons, text="С", command=self.sort, width=2, font=self.sec_font)
+        self.remove = Button(self._frame_buttons, text="С", command=self.sort, width=2, font=self.sec_font)
         self.remove.grid(row=3, column=0, ipady=3, pady=3, sticky=S)
-        Button(self.frame, text='На главную страницу', command=self.go_back).grid(row=2, columnspan=6, pady=5)
+        Button(self._frame, text='На главную страницу', command=self.go_back).grid(row=2, columnspan=6, pady=5)
 
     def _setup_listbox(self):
-        self.frame_list = Frame(self.frame)
-        self.frame_list.grid(row=1, column=1)
-        self.scrollbar = Scrollbar(self.frame_list, orient="vertical")
+        self._frame_list = Frame(self._frame)
+        self._frame_list.grid(row=1, column=1)
+        self.scrollbar = Scrollbar(self._frame_list, orient="vertical")
         self.scrollbar.pack(side=RIGHT, fill=Y)
-        self.listbox = Listbox(self.frame_list, background="#fff", yscrollcommand=self.scrollbar.set)
+        self.listbox = Listbox(self._frame_list, background="#fff", yscrollcommand=self.scrollbar.set)
         self.listbox.pack(side=LEFT, fill=Y)
         self.listbox.config(width=50, height=10)
         self.scrollbar.config(command=self.listbox.yview)
@@ -138,18 +138,18 @@ class SecPage:
         pass
 
     def filt(self):
-        var = self.Dialogue(self.master)
-        data = self.dbtable.get_all_filter(var.result)
+        var = self._dialogue(self.master)
+        data = self._dbtable.get_all_filter(var.result)
         self.fill(data)
 
     def sort(self):
         pass
 
     def start_page(self):
-        self.frame.pack()
+        self._frame.pack()
 
     def go_back(self):
-        self.frame.pack_forget()
+        self._frame.pack_forget()
         self.app.main_page()
 
     def fill(self, data):
@@ -160,12 +160,11 @@ class SecPage:
 
 class SpendPage(SecPage):
     def __init__(self, master=None, app=None):
-        self.asks_for = "Введите ID"
         self.listbox_data = []
         super().__init__(master, app, SpendDialog, "Траты", db.Spendings)
 
     def add(self):
-        var_spending = self.Dialogue(self.master)
+        var_spending = self._dialogue(self.master)
         result = gui_script.add_spending(var_spending.result)
         if result == "EXIT":
             return
@@ -221,12 +220,11 @@ class SpendPage(SecPage):
 
 class GainPage(SecPage):
     def __init__(self, master=None, app=None):
-        self.asks_for = "Введите ID"
         self.listbox_data = []
         super().__init__(master, app, GainDialog, "Доходы", db.Gains)
 
     def add(self):
-        var_gain = self.Dialogue(self.master)
+        var_gain = self._dialogue(self.master)
         result = gui_script.add_gain(var_gain.result)
         if result == "EXIT":
             return
@@ -280,13 +278,12 @@ class GainPage(SecPage):
 
 class CategPage(SecPage):
     def __init__(self, master=None, app=None):
-        self.asks_for = "Введите название категории"
         self.listbox_data = []
         super().__init__(master, app, CategDialog, "Категории", db.Categories)
         self.listbox.config(width=20)
 
     def add(self):
-        var_category = self.Dialogue(self.master)
+        var_category = self._dialogue(self.master)
         result = gui_script.add_category(var_category.result)
         print(result)
         if result == "ERR_exists":
@@ -350,11 +347,11 @@ class SpendDialog(tksd.Dialog):
         return self.e1  # initial focus
 
     def _setup_listbox(self, master):
-        self.frame_list = Frame(master)
-        self.frame_list.grid(row=1, column=1, sticky=W)
-        self.scrollbar = Scrollbar(self.frame_list, orient="vertical")
+        self._frame_list = Frame(master)
+        self._frame_list.grid(row=1, column=1, sticky=W)
+        self.scrollbar = Scrollbar(self._frame_list, orient="vertical")
         self.scrollbar.pack(side=RIGHT, fill=Y)
-        self.e2 = Listbox(self.frame_list, background="#fff", yscrollcommand=self.scrollbar.set)
+        self.e2 = Listbox(self._frame_list, background="#fff", yscrollcommand=self.scrollbar.set)
         self.e2.pack(side=LEFT, fill=Y)
         self.e2.config(width=29, height=10)
         self.scrollbar.config(command=self.e2.yview)
@@ -417,82 +414,82 @@ class CategDialog(tksd.Dialog):
 class SortSpendDialog(tksd.Dialog):
     def body(self, master):
         Label(master, text="Отсортировать:").grid(row=0)
-        self.frame1 = Frame(master)
-        self.frame1.grid(row=1, rowspan=5, column=0)
-        self.radio_var1 = IntVar()
-        Radiobutton(self.frame1, text='По ID', variable=self.radio_var1, value=0, command=self.selection1).grid(row=0)
-        Radiobutton(self.frame1, text='По названию', variable=self.radio_var1, value=1, command=self.selection1).grid(
+        self._frame1 = Frame(master)
+        self._frame1.grid(row=1, rowspan=5, column=0)
+        self._radio_var1 = IntVar()
+        Radiobutton(self._frame1, text='По ID', variable=self._radio_var1, value=0, command=self.selection1).grid(row=0)
+        Radiobutton(self._frame1, text='По названию', variable=self._radio_var1, value=1, command=self.selection1).grid(
             row=1)
-        Radiobutton(self.frame1, text='По категории', variable=self.radio_var1, value=2, command=self.selection1).grid(
+        Radiobutton(self._frame1, text='По категории', variable=self._radio_var1, value=2, command=self.selection1).grid(
             row=2)
-        Radiobutton(self.frame1, text='По стоимости', variable=self.radio_var1, value=3, command=self.selection1).grid(
+        Radiobutton(self._frame1, text='По стоимости', variable=self._radio_var1, value=3, command=self.selection1).grid(
             row=3)
-        Radiobutton(self.frame1, text='По дате', variable=self.radio_var1, value=4, command=self.selection1).grid(row=4)
-        self.frame2 = Frame(master)
-        self.frame2.grid(row=1, rowspan=2, column=1)
-        self.radio_var2 = IntVar()
-        Radiobutton(self.frame2, text='A-Я', variable=self.radio_var2, value=0, command=self.selection2).grid(row=0)
-        Radiobutton(self.frame2, text='Я-A', variable=self.radio_var2, value=1, command=self.selection2).grid(row=1)
-        self.radio_var1.set(0)
-        self.radio_var2.set(0)
-        self.result1 = self.radio_var1.get()
-        self.result2 = self.radio_var2.get()
+        Radiobutton(self._frame1, text='По дате', variable=self._radio_var1, value=4, command=self.selection1).grid(row=4)
+        self._frame2 = Frame(master)
+        self._frame2.grid(row=1, rowspan=2, column=1)
+        self._radio_var2 = IntVar()
+        Radiobutton(self._frame2, text='A-Я', variable=self._radio_var2, value=0, command=self.selection2).grid(row=0)
+        Radiobutton(self._frame2, text='Я-A', variable=self._radio_var2, value=1, command=self.selection2).grid(row=1)
+        self._radio_var1.set(0)
+        self._radio_var2.set(0)
+        self._result1 = self._radio_var1.get()
+        self._result2 = self._radio_var2.get()
 
     def selection1(self):
-        self.result1 = self.radio_var1.get()
+        self._result1 = self._radio_var1.get()
 
     def selection2(self):
-        self.result2 = self.radio_var2.get()
+        self._result2 = self._radio_var2.get()
 
     def apply(self):
-        self.result = (self.result1, self.result2)
+        self.result = (self._result1, self._result2)
 
 
 class SortGainDialog(tksd.Dialog):
     def body(self, master):
         Label(master, text="Отсортировать:").grid(row=0)
-        self.frame1 = Frame(master)
-        self.frame1.grid(row=1, rowspan=4, column=0)
-        self.radio_var1 = IntVar()
-        Radiobutton(self.frame1, text='По ID', variable=self.radio_var1, value=0, command=self.selection1).grid(row=0)
-        Radiobutton(self.frame1, text='По названию', variable=self.radio_var1, value=1, command=self.selection1).grid(
+        self._frame1 = Frame(master)
+        self._frame1.grid(row=1, rowspan=4, column=0)
+        self._radio_var1 = IntVar()
+        Radiobutton(self._frame1, text='По ID', variable=self._radio_var1, value=0, command=self.selection1).grid(row=0)
+        Radiobutton(self._frame1, text='По названию', variable=self._radio_var1, value=1, command=self.selection1).grid(
             row=1)
-        Radiobutton(self.frame1, text='По стоимости', variable=self.radio_var1, value=2, command=self.selection1).grid(
+        Radiobutton(self._frame1, text='По стоимости', variable=self._radio_var1, value=2, command=self.selection1).grid(
             row=2)
-        Radiobutton(self.frame1, text='По дате', variable=self.radio_var1, value=3, command=self.selection1).grid(row=3)
-        self.frame2 = Frame(master)
-        self.frame2.grid(row=1, rowspan=2, column=1)
-        self.radio_var2 = IntVar()
-        Radiobutton(self.frame2, text='A-Я', variable=self.radio_var2, value=0, command=self.selection2).grid(row=0)
-        Radiobutton(self.frame2, text='Я-A', variable=self.radio_var2, value=1, command=self.selection2).grid(row=1)
-        self.radio_var1.set(0)
-        self.radio_var2.set(0)
-        self.result1 = self.radio_var1.get()
-        self.result2 = self.radio_var2.get()
+        Radiobutton(self._frame1, text='По дате', variable=self._radio_var1, value=3, command=self.selection1).grid(row=3)
+        self._frame2 = Frame(master)
+        self._frame2.grid(row=1, rowspan=2, column=1)
+        self._radio_var2 = IntVar()
+        Radiobutton(self._frame2, text='A-Я', variable=self._radio_var2, value=0, command=self.selection2).grid(row=0)
+        Radiobutton(self._frame2, text='Я-A', variable=self._radio_var2, value=1, command=self.selection2).grid(row=1)
+        self._radio_var1.set(0)
+        self._radio_var2.set(0)
+        self._result1 = self._radio_var1.get()
+        self._result2 = self._radio_var2.get()
 
     def selection1(self):
-        self.result1 = self.radio_var1.get()
+        self._result1 = self._radio_var1.get()
 
     def selection2(self):
-        self.result2 = self.radio_var2.get()
+        self._result2 = self._radio_var2.get()
 
     def apply(self):
-        self.result = (self.result1, self.result2)
+        self.result = (self._result1, self._result2)
 
 
 class SortCategDialog(tksd.Dialog):
     def body(self, master):
         Label(master, text="Отсортировать:").grid(row=0)
-        self.frame = Frame(master)
-        self.frame.grid(row=1, rowspan=4, column=0)
-        self.radio_var = IntVar()
-        Radiobutton(self.frame, text='A-Я', variable=self.radio_var, value=0, command=self.selection).grid(row=0)
-        Radiobutton(self.frame, text='Я-A', variable=self.radio_var, value=1, command=self.selection).grid(row=1)
-        self.radio_var.set(0)
-        self.result = self.radio_var.get()
+        self._frame = Frame(master)
+        self._frame.grid(row=1, rowspan=4, column=0)
+        self._radio_var = IntVar()
+        Radiobutton(self._frame, text='A-Я', variable=self._radio_var, value=0, command=self.selection).grid(row=0)
+        Radiobutton(self._frame, text='Я-A', variable=self._radio_var, value=1, command=self.selection).grid(row=1)
+        self._radio_var.set(0)
+        self.result = self._radio_var.get()
 
     def selection(self):
-        self.result = self.radio_var.get()
+        self.result = self._radio_var.get()
 
     def apply(self):
-        self.result = self.radio_var.get()
+        self.result = self._radio_var.get()
