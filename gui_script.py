@@ -12,13 +12,14 @@ def remove_category(name):
 
 def add_spending(data, totalvar):
     try:
-        if float(data[2]) <= totalvar.get():
+        cost = float(data[2])
+        if cost <= totalvar.get():
             result = db.Spendings.add(data)
             calculate_total()
             calculate_month_spend()
         else:
             result = "ERR_nomoney"
-    except TypeError as error:
+    except ValueError:
         result = "ERR_value"
     return result
 

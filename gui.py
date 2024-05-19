@@ -170,7 +170,7 @@ class SpendPage(SecPage):
         if result == "EXIT":
             return
         elif result == "ERR_future":
-            messagebox.showerror("Ошибка (доходы)", "Нельзя вводить будущую дату!")
+            messagebox.showerror("Ошибка (траты)", "Нельзя вводить будущую дату!")
         elif result == "ERR_empty":
             messagebox.showerror("Ошибка (траты)", "Строки не должны быть пустыми!")
         elif result == "ERR_value":
