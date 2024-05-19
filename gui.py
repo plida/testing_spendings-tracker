@@ -160,12 +160,13 @@ class SecPage:
 
 class SpendPage(SecPage):
     def __init__(self, master=None, app=None):
+        self.app = app
         self.listbox_data = []
         super().__init__(master, app, SpendDialog, "Траты", db.Spendings)
 
     def add(self):
         var_spending = self._dialogue(self.master)
-        result = gui_script.add_spending(var_spending.result)
+        result = gui_script.add_spending(var_spending.result, self.app.totalVAR)
         if result == "EXIT":
             return
         elif result == "ERR_future":
@@ -176,6 +177,8 @@ class SpendPage(SecPage):
             messagebox.showerror("Ошибка (траты)", "Стоимость должна быть положительным числом меньше 10^9!")
         elif result == "ERR_toolong":
             messagebox.showerror("Ошибка (траты)", "Название траты слишком длинное!")
+        elif result == "ERR_nomoney":
+            messagebox.showerror("Ошибка (траты)", "Недостаточно средств!")
         elif result:
             data = db.Spendings.get_all()
             self.fill(data)

@@ -10,10 +10,16 @@ def remove_category(name):
     db.Categories.remove(name)
 
 
-def add_spending(data):
-    result = db.Spendings.add(data)
-    calculate_total()
-    calculate_month_spend()
+def add_spending(data, totalvar):
+    try:
+        if float(data[2]) <= totalvar.get():
+            result = db.Spendings.add(data)
+            calculate_total()
+            calculate_month_spend()
+        else:
+            result = "ERR_nomoney"
+    except TypeError as error:
+        result = "ERR_value"
     return result
 
 
