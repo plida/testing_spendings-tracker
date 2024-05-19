@@ -82,7 +82,7 @@ class App:
 
     @staticmethod
     def _show_info():
-        messagebox.showinfo("Учёт собственных денежных средств", "Автор: Крестьянова Елизавета\nВерсия 2024.05.17")
+        messagebox.showinfo("Учёт собственных денежных средств", "Автор: Крестьянова Елизавета\nВерсия 2024.05.19")
 
     def _exit_app(self):
         self._root.destroy()
