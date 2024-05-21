@@ -70,7 +70,7 @@ class Categories(Base):
             return new_data
 
         for category in _session.query(Categories):
-            if category.name.find(data) != -1 and category.deleted != 0:
+            if category.name.find(data) != -1 and category.deleted == 0:
                 new_data.append(category.name)
         _session.commit()
         return new_data
@@ -152,7 +152,10 @@ class Spendings(Base):
         _session = Sessions()
         data = []
         for spending in _session.query(Spendings):
-            if spending.date > datetime.date.today() - datetime.timedelta(days=30) and spending.deleted == 0:
+            today = datetime.date.today()
+            date1 = today - datetime.timedelta(today.day)
+            date2 = today + datetime.timedelta(monthrange(today.year, today.month)[1] - today.day + 1)
+            if date1 < spending.date < date2 and spending.deleted == 0:
                 data.append((spending.id, spending.name, spending.category, spending.cost, spending.date))
         _session.commit()
         return data

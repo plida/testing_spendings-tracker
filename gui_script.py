@@ -32,12 +32,14 @@ def remove_spending(uid):
 
 def add_gain(data):
     result = db.Gains.add(data)
+    calculate_total()
     calculate_month_gain()
     return result
 
 
 def remove_gain(uid):
     db.Gains.remove(uid)
+    calculate_total()
     calculate_month_gain()
 
 
