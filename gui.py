@@ -82,7 +82,7 @@ class App:
 
     @staticmethod
     def _show_info():
-        messagebox.showinfo("Учёт собственных денежных средств", "Автор: Крестьянова Елизавета\nВерсия 2024.05.19")
+        messagebox.showinfo("Учёт собственных денежных средств", "Автор: Крестьянова Елизавета\nВерсия 2024.05.22")
 
     def _exit_app(self):
         self._root.destroy()
@@ -194,6 +194,7 @@ class SpendPage(SecPage):
             var = self.listbox.selection_get()
             var = var[0:var.find(" ")]
         else:
+            messagebox.showerror("Ошибка (траты)", "Выберите строку на удаление!")
             return
         gui_script.remove_spending(var)
         data = db.Spendings.get_all()
@@ -204,10 +205,8 @@ class SpendPage(SecPage):
 
     def sort(self):
         var = SortSpendDialog(self.master)
-        print(var.result)
         if var.result:
             data = gui_script.sort(self.listbox_data, var.result[0])
-            print(data, var.result[0])
             self.listbox.delete(0, END)
             if var.result[1] == 1:
                 data.reverse()
@@ -254,6 +253,7 @@ class GainPage(SecPage):
             var = self.listbox.selection_get()
             var = var[0:var.find(" ")]
         else:
+            messagebox.showerror("Ошибка (доходы)", "Выберите строку на удаление!")
             return
         gui_script.remove_gain(var)
         data = db.Gains.get_all()
@@ -288,7 +288,6 @@ class CategPage(SecPage):
     def add(self):
         var_category = self._dialogue(self.master)
         result = gui_script.add_category(var_category.result)
-        print(result)
         if result == "ERR_exists":
             messagebox.showinfo("Ошибка (категории)", "Категория уже существует.")
         elif result == "ERR_too_long":

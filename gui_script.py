@@ -11,6 +11,8 @@ def remove_category(name):
 
 
 def add_spending(data, totalvar):
+    if not data or data[0] == "" and data[1] == "" and data[2] == "" and not data[3]:
+        return "EXIT"
     try:
         cost = float(data[2])
         if cost <= totalvar.get():
@@ -19,7 +21,7 @@ def add_spending(data, totalvar):
             calculate_month_spend()
         else:
             result = "ERR_nomoney"
-    except ValueError:
+    except ValueError or TypeError:
         result = "ERR_value"
     return result
 
