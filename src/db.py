@@ -8,6 +8,8 @@ from calendar import monthrange
 class Base(DeclarativeBase):
     pass
 
+global initSessions 
+initSessions = None
 
 class Categories(Base):
     __tablename__ = 'categories'
@@ -16,7 +18,9 @@ class Categories(Base):
     deleted: Mapped[bool]
 
     @staticmethod
-    def add(name):
+    def add(name, Sessions=initSessions):
+        if Sessions == None:
+            Sessions=initSessions
         try:
             if not name:
                 return "EXIT"
@@ -41,7 +45,9 @@ class Categories(Base):
             return False
 
     @staticmethod
-    def remove(name):
+    def remove(name, Sessions=initSessions):
+        if Sessions == None:
+            Sessions=initSessions
         try:
             name = name.lower()
             _session = Sessions()
@@ -53,7 +59,9 @@ class Categories(Base):
             print("Ошибка при удалении категории:", error)
 
     @staticmethod
-    def get_all():
+    def get_all(Sessions=initSessions):
+        if Sessions == None:
+            Sessions=initSessions
         _session = Sessions()
         data = []
         for category in _session.query(Categories).filter_by(deleted=False):
@@ -62,7 +70,9 @@ class Categories(Base):
         return data
 
     @staticmethod
-    def get_all_filter(data):
+    def get_all_filter(data, Sessions=initSessions):
+        if Sessions == None:
+            Sessions=initSessions
         _session = Sessions()
         new_data = []
         if not data or data == "":
@@ -86,7 +96,9 @@ class Spendings(Base):
     deleted: Mapped[bool]
 
     @staticmethod
-    def add(data, curr_date=datetime.date.today()):
+    def add(data, curr_date=datetime.date.today(), Sessions=initSessions):
+        if Sessions == None:
+            Sessions=initSessions
         try:
             if not data or data[0] == "" and data[1] == "" and data[2] == "" and not data[3]:
                 return "EXIT"
@@ -112,13 +124,17 @@ class Spendings(Base):
             return False
 
     @staticmethod
-    def remove(uid):
+    def remove(uid, Sessions=initSessions):
+        if Sessions == None:
+            Sessions=initSessions
         _session = Sessions()
         _session.query(Spendings).filter(Spendings.id == uid).update({"deleted": 1})
         _session.commit()
 
     @staticmethod
-    def get_all():
+    def get_all(Sessions=initSessions):
+        if Sessions == None:
+            Sessions=initSessions
         _session = Sessions()
         data = []
         for spending in _session.query(Spendings).filter_by(deleted=False):
@@ -127,7 +143,9 @@ class Spendings(Base):
         return data
 
     @staticmethod
-    def get_all_filter(data):
+    def get_all_filter(data, Sessions=initSessions):
+        if Sessions == None:
+            Sessions=initSessions
         _session = Sessions()
         new_data = []
         if not data or (not data[0] or data[0] == "") and not data[1] and not data[2]:
@@ -148,7 +166,9 @@ class Spendings(Base):
         return new_data
 
     @staticmethod
-    def get_all_recent(curr_date=datetime.date.today()):
+    def get_all_recent(curr_date=datetime.date.today(), Sessions=initSessions):
+        if Sessions == None:
+            Sessions=initSessions
         _session = Sessions()
         data = []
         for spending in _session.query(Spendings):
@@ -170,7 +190,9 @@ class Gains(Base):
     deleted: Mapped[bool]
 
     @staticmethod
-    def add(data, curr_date=datetime.date.today()):
+    def add(data, curr_date=datetime.date.today(), Sessions=initSessions):
+        if Sessions == None:
+            Sessions=initSessions
         try:
             if not data or data[0] == "" and data[1] == "" and not data[2]:
                 return "EXIT"
@@ -197,13 +219,17 @@ class Gains(Base):
             return False
 
     @staticmethod
-    def remove(uid):
+    def remove(uid, Sessions=initSessions):
+        if Sessions == None:
+            Sessions=initSessions
         _session = Sessions()
         _session.query(Gains).filter(Gains.id == uid).update({"deleted": 1})
         _session.commit()
 
     @staticmethod
-    def get_all():
+    def get_all(Sessions=initSessions):
+        if Sessions == None:
+            Sessions=initSessions
         _session = Sessions()
         data = []
         for gain in _session.query(Gains).filter_by(deleted=False):
@@ -212,7 +238,9 @@ class Gains(Base):
         return data
 
     @staticmethod
-    def get_all_filter(data):
+    def get_all_filter(data, Sessions=initSessions):
+        if Sessions == None:
+            Sessions=initSessions
         _session = Sessions()
         new_data = []
         if not data or (not data[0] or data[0] == "") and not data[1] and not data[2]:
@@ -238,7 +266,9 @@ class Gains(Base):
         return new_data
 
     @staticmethod
-    def get_all_recent(curr_date = datetime.date.today()):
+    def get_all_recent(curr_date = datetime.date.today(), Sessions=initSessions):
+        if Sessions == None:
+            Sessions=initSessions
         _session = Sessions()
         data = []
         for gain in _session.query(Gains):
@@ -250,10 +280,9 @@ class Gains(Base):
         _session.commit()
         return data
 
-
 def initiate(path):
     global engine
     engine = db.create_engine("sqlite:///" + path, echo=True)
     Base.metadata.create_all(engine)
-    global Sessions 
-    Sessions = sessionmaker(bind=engine)
+    global initSessions
+    initSessions = sessionmaker(bind=engine)
