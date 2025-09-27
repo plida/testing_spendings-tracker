@@ -24,6 +24,8 @@ class Categories(Base):
         try:
             if not name:
                 return "EXIT"
+            if name.replace(" ", "") == "":
+                return "ERR_empty"
             name = str(name).lower()
             if len(name) > 15:
                 return "ERR_too_long"
@@ -100,15 +102,17 @@ class Spendings(Base):
         if Sessions == None:
             Sessions=initSessions
         try:
-            if not data or data[0] == "" and data[1] == "" and data[2] == "" and not data[3]:
+            if not data or str(data[0]).replace(" ", "") == "" and str(data[1]).replace(" ", "") == "" and str(data[2]).replace(" ", "") == "" and not str(data[3]).replace(" ", ""):
                 return "EXIT"
-            if data[0] == "" or data[1] == "" or data[2] == "" or not data[3]:
+            if str(data[0]).replace(" ", "") == "" or str(data[1]).replace(" ", "") == "" or str(data[2]).replace(" ", "") == "" or not str(data[3]).replace(" ", ""):
                 return "ERR_empty"
             if len(data[0]) > 15:
                 return "ERR_toolong"
             try:
                 if data[3] > curr_date:
                     return "ERR_future"
+                if data[1] not in Categories.get_all(Sessions):
+                    return "ERR_nocategory"
                 data[2] = float(data[2])
                 if 0 < data[2] < 10**9:
                     _session = Sessions()
@@ -148,7 +152,7 @@ class Spendings(Base):
             Sessions=initSessions
         _session = Sessions()
         new_data = []
-        if not data or (not data[0] or data[0] == "") and not data[1] and not data[2]:
+        if not data or (not data[0] or str(data[0]).replace(" ", "") == "") and not data[1] and not data[2]:
             new_data = Spendings.get_all()
             return new_data
         if not data[1]:
@@ -158,9 +162,9 @@ class Spendings(Base):
         if not data[3]:
             data[3] = ""
         for spending in _session.query(Spendings):
-            if ((spending.name.find(data[0]) != -1 or data[0] == "") and (
-                    spending.category == data[1] or data[1] == "") and (spending.cost == data[2] or data[2] == 0)
-                    and (spending.date == data[3] or data[3] == "") and (not spending.deleted)):
+            if ((spending.name.find(data[0]) != -1 or str(data[0]).replace(" ", "") == "") and (
+                    spending.category == data[1] or str(data[1]).replace(" ", "") == "") and (spending.cost == data[2] or data[2] == 0)
+                    and (spending.date == data[3] or str(data[3]).replace(" ", "") == "") and (not spending.deleted)):
                 new_data.append((spending.id, spending.name, spending.category, spending.cost, spending.date))
         _session.commit()
         return new_data
@@ -194,9 +198,9 @@ class Gains(Base):
         if Sessions == None:
             Sessions=initSessions
         try:
-            if not data or data[0] == "" and data[1] == "" and not data[2]:
+            if not data or str(data[0]).replace(" ", "") == "" and str(data[1]).replace(" ", "") == "" and not data[2]:
                 return "EXIT"
-            if data[0] == "" or data[1] == "" or not data[2]:
+            if str(data[0]).replace(" ", "") == "" or str(data[1]).replace(" ", "") == "" or not data[2]:
                 return "ERR_empty"
             if len(data[0]) > 15:
                 return "ERR_toolong"

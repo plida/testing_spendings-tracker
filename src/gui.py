@@ -179,6 +179,8 @@ class SpendPage(SecPage):
             messagebox.showerror("Ошибка (траты)", "Название траты слишком длинное!")
         elif result == "ERR_nomoney":
             messagebox.showerror("Ошибка (траты)", "Недостаточно средств!")
+        elif result == "ERR_nocategory":
+            messagebox.showerror("Ошибка (траты)", "Нет такой категории!")
         elif result:
             data = db.Spendings.get_all()
             self.fill(data)
