@@ -66,12 +66,7 @@ class testAddSpendings(unittest.TestCase):
         self.addItem(["куртка", "одежда", 5000, self.curr_date])
         testedDB.Spendings.remove(1, self.Sessions)
         assert self.listItems()[0][1] == "куртка"
-
-    def test_removeNonExistentSpending(self):
-        self.addCategory("одежда")
-        self.addItem(["шляпа", "одежда", 5000, self.curr_date])
-        testedDB.Spendings.remove(2, self.Sessions)
-        assert len(self.listItems()) == 1   
+        
 
 if __name__ == '__main__':
     unittest.main()

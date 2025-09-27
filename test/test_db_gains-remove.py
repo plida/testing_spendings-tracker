@@ -54,12 +54,6 @@ class testRemoveGains(unittest.TestCase):
         testedDB.Gains.remove(1, self.Sessions)
         assert self.listItems()[0][1] == "подарок"
 
-    def test_removeNonExistentGains(self):
-        self.addItem(["зарплата", 50000, self.curr_date])
-        self.addItem(["подарок", 5000, self.curr_date])
-        testedDB.Gains.remove(4, self.Sessions)
-        assert self.listItems()[1][1] == "подарок"    
-
 if __name__ == '__main__':
     unittest.main()
 

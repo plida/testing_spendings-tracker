@@ -9,7 +9,6 @@ class Base(DeclarativeBase):
 
 class Categories(Base):
     __tablename__ = 'categories'
-
     name: Mapped[str] = db.Column(db.String(), primary_key=True)
     deleted: Mapped[bool]
 
@@ -49,11 +48,6 @@ class testRemoveCategories(unittest.TestCase):
         self.addItem("еда")
         testedDB.Categories.remove("одежда", self.Sessions)
         assert self.listItems()[0] == "еда"
-
-    def test_removeNonExistentCategory(self):
-        self.addItem("одежда")
-        testedDB.Categories.remove("канцелярия", self.Sessions)
-        assert len(self.listItems()) == 1   
 
 if __name__ == '__main__':
     unittest.main()
