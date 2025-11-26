@@ -1,4 +1,4 @@
-import db
+from . import db
 
 
 def add_category(name):

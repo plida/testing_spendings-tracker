@@ -286,7 +286,7 @@ class Gains(Base):
 
 def initiate(path):
     global engine
-    engine = db.create_engine("sqlite:///" + path, echo=True)
+    engine = db.create_engine("sqlite:///" + path)
     Base.metadata.create_all(engine)
     global initSessions
     initSessions = sessionmaker(bind=engine)

@@ -2,8 +2,8 @@ import datetime
 from tkinter import *
 from tkinter import messagebox
 import tkinter.simpledialog as tksd
-import gui_script
-import db
+from . import gui_script
+from . import db
 from tkcalendar import Calendar
 
 month_list = ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь',

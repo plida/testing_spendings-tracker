@@ -1,10 +1,10 @@
 from tkinter import *
-import gui
-import db
+from . import gui
+from . import db
 
 root = Tk()
 app = gui.App(root)
-db.initiate("src/spendings.db")
+db.initiate("src/app/spendings.db")
 app.page1.fill(db.Spendings.get_all())
 app.page2.fill(db.Gains.get_all())
 app.page3.fill(db.Categories.get_all())

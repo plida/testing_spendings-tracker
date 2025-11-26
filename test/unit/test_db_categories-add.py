@@ -1,18 +1,18 @@
-from src import db as testedDB 
+from src.app import db as testedDB
 import datetime
 import unittest
 import sqlalchemy as db
 from sqlalchemy.orm import sessionmaker, DeclarativeBase, Mapped
-
 class Base(DeclarativeBase):
     pass
 
 class Categories(Base):
     __tablename__ = 'categories'
+
     name: Mapped[str] = db.Column(db.String(), primary_key=True)
     deleted: Mapped[bool]
 
-class testRemoveCategories(unittest.TestCase):
+class testAddCategories(unittest.TestCase):
     def initiateDB(self, path):
         global engine
         engine = db.create_engine("sqlite:///" + path, echo=True)
@@ -37,19 +37,23 @@ class testRemoveCategories(unittest.TestCase):
         _session.commit()
         return data
 
-    def addItem(self, data):
-        _session = self.Sessions()
-        query = Categories(name=data, deleted=0)
-        _session.add(query)
-        _session.commit()
+    def test_addGains(self):
+        testedDB.Categories.add("одежда", self.Sessions)
+        assert len(self.listItems()) == 1
 
-    def test_removeCategory(self):
-        self.addItem("одежда")
-        self.addItem("еда")
-        testedDB.Categories.remove("одежда", self.Sessions)
-        assert self.listItems()[0] == "еда"
+    def test_duplicate(self):
+        testedDB.Categories.add("одежда", self.Sessions)
+        testedDB.Categories.add("одежда", self.Sessions)
+        assert len(self.listItems()) == 1
+
+    def test_duplicateUppercase(self):
+        testedDB.Categories.add("одежда", self.Sessions)
+        testedDB.Categories.add("Одежда", self.Sessions)
+        assert len(self.listItems()) == 1
+
+    def test_emptyname(self):
+        testedDB.Categories.add("   ", self.Sessions)
+        assert len(self.listItems()) == 0
 
 if __name__ == '__main__':
     unittest.main()
-
-    

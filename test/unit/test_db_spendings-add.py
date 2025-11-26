@@ -1,4 +1,4 @@
-from src import db as testedDB 
+from src.app import db as testedDB
 import datetime
 import unittest
 import sqlalchemy as db
