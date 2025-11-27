@@ -15,7 +15,7 @@ class App:
         # параметры приложения
         self._root = root
         self._root.minsize(600, 300)
-        self._root.maxsize(600, 300)
+        self._root.maxsize(600, 400)
         self._root.title("Учёт собственных средств")
         self.main_font = ("Calibri", 30)
         self.sec_font = ("Calibri", 15)
@@ -111,14 +111,14 @@ class SecPage:
     def _setup_buttons(self):
         self._frame_buttons = Frame(self._frame)
         self._frame_buttons.grid(row=1, rowspan=4, column=0, sticky=NW, padx=10)
-        self.add = Button(self._frame_buttons, text="+", command=self.add, width=2, font=self.sec_font)
-        self.add.grid(row=0, column=0, ipady=3, pady=3, sticky=N)
-        self.remove = Button(self._frame_buttons, text="-", command=self.remove, width=2, font=self.sec_font)
-        self.remove.grid(row=1, column=0, ipady=3, pady=3)
-        self.remove = Button(self._frame_buttons, text="Ф", command=self.filt, width=2, font=self.sec_font)
-        self.remove.grid(row=2, column=0, ipady=3, pady=3)
-        self.remove = Button(self._frame_buttons, text="С", command=self.sort, width=2, font=self.sec_font)
-        self.remove.grid(row=3, column=0, ipady=3, pady=3, sticky=S)
+        self.addBtn = Button(self._frame_buttons, text="+", command=self.add, width=2, font=self.sec_font)
+        self.addBtn.grid(row=0, column=0, ipady=3, pady=3, sticky=N)
+        self.removeBtn = Button(self._frame_buttons, text="-", command=self.remove, width=2, font=self.sec_font)
+        self.removeBtn.grid(row=1, column=0, ipady=3, pady=3)
+        self.removeBtn = Button(self._frame_buttons, text="Ф", command=self.filt, width=2, font=self.sec_font)
+        self.removeBtn.grid(row=2, column=0, ipady=3, pady=3)
+        self.removeBtn = Button(self._frame_buttons, text="С", command=self.sort, width=2, font=self.sec_font)
+        self.removeBtn.grid(row=3, column=0, ipady=3, pady=3, sticky=S)
         Button(self._frame, text='На главную страницу', command=self.go_back).grid(row=2, columnspan=6, pady=5)
 
     def _setup_listbox(self):
