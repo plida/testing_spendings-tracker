@@ -48,21 +48,23 @@ class App:
             .grid(row=3, column=2, padx=5)
 
     def _setup_labels(self):
-        Label(self._frame, textvariable=self.totalVAR, font=self.main_font).grid(row=0, column=1)
+        self.total_label = Label(self._frame, textvariable=self.totalVAR, font=self.main_font)
+        self.total_label.grid(row=0, column=1)
         _f_stats = Frame(self._frame)
         _f_stats.grid(sticky=NW, rowspan=2, columnspan=2, pady=20)
 
         f_gains = Frame(_f_stats)
         f_gains.grid(sticky=W, row=0, columnspan=2)
-        Label(f_gains, text=f"Доходы за месяц {month_list[datetime.date.today().month - 1]}:", font=self.sec_font).grid(
-            row=0, column=0)
-        Label(f_gains, textvariable=self.gainsVAR, font=self.sec_font).grid(row=0, column=1)
+        Label(f_gains, text=f"Доходы за месяц {month_list[datetime.date.today().month - 1]}:", font=self.sec_font).grid(row=0, column=0)
+        self.gain_label = Label(f_gains, textvariable=self.gainsVAR, font=self.sec_font)
+        self.gain_label.grid(row=0, column=1)
 
         _f_spendings = Frame(_f_stats)
         _f_spendings.grid(sticky=W, row=1, columnspan=2)
         Label(_f_spendings, text=f"Траты за месяц {month_list[datetime.date.today().month - 1]}:",
               font=self.sec_font).grid(row=0, column=0)
-        Label(_f_spendings, textvariable=self.spendingsVAR, font=self.sec_font).grid(row=0, column=1)
+        self.spend_label = Label(_f_spendings, textvariable=self.spendingsVAR, font=self.sec_font)
+        self.spend_label.grid(row=0, column=1)
 
     def _setup_grid(self):
         for i in range(10):
@@ -115,10 +117,10 @@ class SecPage:
         self.addBtn.grid(row=0, column=0, ipady=3, pady=3, sticky=N)
         self.removeBtn = Button(self._frame_buttons, text="-", command=self.remove, width=2, font=self.sec_font)
         self.removeBtn.grid(row=1, column=0, ipady=3, pady=3)
-        self.removeBtn = Button(self._frame_buttons, text="Ф", command=self.filt, width=2, font=self.sec_font)
-        self.removeBtn.grid(row=2, column=0, ipady=3, pady=3)
-        self.removeBtn = Button(self._frame_buttons, text="С", command=self.sort, width=2, font=self.sec_font)
-        self.removeBtn.grid(row=3, column=0, ipady=3, pady=3, sticky=S)
+        self.filterBtn = Button(self._frame_buttons, text="Ф", command=self.filt, width=2, font=self.sec_font)
+        self.filterBtn.grid(row=2, column=0, ipady=3, pady=3)
+        self.sortBtn = Button(self._frame_buttons, text="С", command=self.sort, width=2, font=self.sec_font)
+        self.sortBtn.grid(row=3, column=0, ipady=3, pady=3, sticky=S)
         Button(self._frame, text='На главную страницу', command=self.go_back).grid(row=2, columnspan=6, pady=5)
 
     def _setup_listbox(self):

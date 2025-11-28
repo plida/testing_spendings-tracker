@@ -1,5 +1,5 @@
 from . import db
-
+import datetime
 
 def add_category(name):
     result = db.Categories.add(name)
@@ -17,8 +17,6 @@ def add_spending(data, totalvar):
         cost = float(data[2])
         if cost <= totalvar.get():
             result = db.Spendings.add(data)
-            calculate_total()
-            calculate_month_spend()
         else:
             result = "ERR_nomoney"
     except ValueError or TypeError:
@@ -28,21 +26,15 @@ def add_spending(data, totalvar):
 
 def remove_spending(uid):
     db.Spendings.remove(uid)
-    calculate_total()
-    calculate_month_spend()
 
 
 def add_gain(data):
     result = db.Gains.add(data)
-    calculate_total()
-    calculate_month_gain()
     return result
 
 
 def remove_gain(uid):
     db.Gains.remove(uid)
-    calculate_total()
-    calculate_month_gain()
 
 
 def calculate_total():
@@ -56,16 +48,16 @@ def calculate_total():
     return sm
 
 
-def calculate_month_spend():
-    data1 = db.Spendings.get_all_recent()
+def calculate_month_spend(curr_date=datetime.date.today()):
+    data1 = db.Spendings.get_all_recent(curr_date)
     sm = 0
     for row in data1:
         sm += row[3]
     return sm
 
 
-def calculate_month_gain():
-    data1 = db.Gains.get_all_recent()
+def calculate_month_gain(curr_date=datetime.date.today()):
+    data1 = db.Gains.get_all_recent(curr_date)
     sm = 0
     for row in data1:
         sm += row[2]
