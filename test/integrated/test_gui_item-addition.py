@@ -26,14 +26,59 @@ class testAddition(unittest.TestCase):
 
         app.make_page(page=app.page3)
         app.page3.add(itemToAdd)
+        root.destroy()
+
+        assert itemToAdd == testedDB.Categories.get_all()[0]
+
+    def testGUIGainsAdd(self):
+        root = Tk()
+        app = testedGUI.App(root)
+
+        itemToAdd = ['item', 500, self.curr_date]
+        for x in itemToAdd:
+          if isinstance(x, str):
+            x.strip()
+
+        app.make_page(page=app.page2)
+        app.page2.add(itemToAdd)
+        root.destroy()
+
+        assert itemToAdd == list(testedDB.Gains.get_all()[0][1:4])
+
+    def testGUISpendingsAdd(self):
+        root = Tk()
+        app = testedGUI.App(root)
+
+        testedDB.Categories.add('a')
+        testedDB.Gains.add(['salary', 5000, self.curr_date])
+
+        itemToAdd = ['item', 'a', 500, self.curr_date]
+        for x in itemToAdd:
+          if isinstance(x, str):
+            x.strip()
+
+        app.make_page(page=app.page2)
+        app.page1.add(itemToAdd)
+        root.destroy()
+
+        assert itemToAdd == list(testedDB.Spendings.get_all()[0][1:5])
+
+    def testGUIDisplayCategoryAdd(self):
+        root = Tk()
+        app = testedGUI.App(root)
+
+        itemToAdd = 'item'
+
+        app.make_page(page=app.page3)
+        app.page3.add(itemToAdd)
         guiDisplay = app.page3.listbox.get(0, END)
         root.destroy()
         
         listedItem = guiDisplay[0]
 
-        assert listedItem == itemToAdd and itemToAdd == testedDB.Categories.get_all()[0]
+        assert listedItem == itemToAdd
 
-    def testGUIGainsAdd(self):
+    def testGUIDisplayGainsAdd(self):
         root = Tk()
         app = testedGUI.App(root)
 
@@ -49,9 +94,9 @@ class testAddition(unittest.TestCase):
 
         listedItem = [name, float(price), date]
 
-        assert listedItem == itemToAdd and itemToAdd == list(testedDB.Gains.get_all()[0][1:4])
+        assert listedItem == itemToAdd
 
-    def testGUISpendingsAdd(self):
+    def testGUIDisplaySpendingsAdd(self):
         root = Tk()
         app = testedGUI.App(root)
 
@@ -72,7 +117,7 @@ class testAddition(unittest.TestCase):
         date = datetime.datetime.strptime(date, "%d/%m/%Y").date()
         listedItem = [name, category, float(price), date]
 
-        assert listedItem == itemToAdd and itemToAdd == list(testedDB.Spendings.get_all()[0][1:5])
+        assert listedItem == itemToAdd
     
         
 if __name__ == '__main__':
