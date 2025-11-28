@@ -29,7 +29,9 @@ class testAddition(unittest.TestCase):
         guiDisplay = app.page3.listbox.get(0, END)
         root.destroy()
         
-        assert testedDB.Categories.get_all()[0] == itemToAdd and guiDisplay[0] == itemToAdd
+        listedItem = guiDisplay[0]
+
+        assert listedItem == itemToAdd and itemToAdd == testedDB.Categories.get_all()[0]
 
     def testGUIGainsAdd(self):
         root = Tk()
@@ -45,7 +47,9 @@ class testAddition(unittest.TestCase):
         id, name, price, date = guiDisplay[0].split(' ')
         date = datetime.datetime.strptime(date, "%d/%m/%Y").date()
 
-        assert name == itemToAdd[0] and float(price) == itemToAdd[1] and date == itemToAdd[2]
+        listedItem = [name, float(price), date]
+
+        assert listedItem == itemToAdd and itemToAdd == list(testedDB.Gains.get_all()[0][1:4])
 
     def testGUISpendingsAdd(self):
         root = Tk()
@@ -53,7 +57,7 @@ class testAddition(unittest.TestCase):
 
         testedDB.Categories.add('a')
         testedDB.Gains.add(['salary', 5000, self.curr_date])
-        
+
         itemToAdd = ['item', 'a', 500, self.curr_date]
         for x in itemToAdd:
           if isinstance(x, str):
@@ -66,8 +70,9 @@ class testAddition(unittest.TestCase):
         
         id, name, category, price, date = guiDisplay[0].split(' ')
         date = datetime.datetime.strptime(date, "%d/%m/%Y").date()
+        listedItem = [name, category, float(price), date]
 
-        assert name == itemToAdd[0] and category == itemToAdd[1] and float(price) == itemToAdd[2] and date == itemToAdd[3]
+        assert listedItem == itemToAdd and itemToAdd == list(testedDB.Spendings.get_all()[0][1:5])
     
         
 if __name__ == '__main__':
