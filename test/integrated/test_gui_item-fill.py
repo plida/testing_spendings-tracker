@@ -17,60 +17,17 @@ class testAddition(unittest.TestCase):
         for table in reversed(meta.sorted_tables):
             session.execute(table.delete())
         session.commit()
-        
-    def testGUICategoryAdd(self):
+
+    def testGUIFillCategories(self):
         root = Tk()
         app = testedGUI.App(root)
 
         itemToAdd = 'item'
 
-        app.make_page(page=app.page3)
-        app.page3.add(itemToAdd)
-        root.destroy()
-
-        assert itemToAdd == testedDB.Categories.get_all()[0]
-
-    def testGUIGainsAdd(self):
-        root = Tk()
-        app = testedGUI.App(root)
-
-        itemToAdd = ['item', 500, self.curr_date]
-        for x in itemToAdd:
-          if isinstance(x, str):
-            x.strip()
-
-        app.make_page(page=app.page2)
-        app.page2.add(itemToAdd)
-        root.destroy()
-
-        assert itemToAdd == list(testedDB.Gains.get_all()[0][1:4])
-
-    def testGUISpendingsAdd(self):
-        root = Tk()
-        app = testedGUI.App(root)
-
-        testedDB.Categories.add('a')
-        testedDB.Gains.add(['salary', 5000, self.curr_date])
-
-        itemToAdd = ['item', 'a', 500, self.curr_date]
-        for x in itemToAdd:
-          if isinstance(x, str):
-            x.strip()
-
-        app.make_page(page=app.page1)
-        app.page1.add(itemToAdd)
-        root.destroy()
-
-        assert itemToAdd == list(testedDB.Spendings.get_all()[0][1:5])
-
-    def testGUIDisplayCategoryAdd(self):
-        root = Tk()
-        app = testedGUI.App(root)
-
-        itemToAdd = 'item'
+        testedDB.Categories.add(itemToAdd)
 
         app.make_page(page=app.page3)
-        app.page3.add(itemToAdd)
+        app.page3.fill(testedDB.Categories.get_all())
         guiDisplay = app.page3.listbox.get(0, END)
         root.destroy()
         
@@ -78,14 +35,15 @@ class testAddition(unittest.TestCase):
 
         assert listedItem == itemToAdd
 
-    def testGUIDisplayGainsAdd(self):
+    def testGUIFillGains(self):
+        itemToAdd = ['item', 500, self.curr_date]
+        testedDB.Gains.add(itemToAdd)
+
         root = Tk()
         app = testedGUI.App(root)
 
-        itemToAdd = ['item', 500, self.curr_date]
-
         app.make_page(page=app.page2)
-        app.page2.add(itemToAdd)
+        app.page2.fill(testedDB.Gains.get_all())
         guiDisplay = list(app.page2.listbox.get(0, END))
         root.destroy()
         
@@ -96,19 +54,21 @@ class testAddition(unittest.TestCase):
 
         assert listedItem == itemToAdd
 
-    def testGUIDisplaySpendingsAdd(self):
+    def testGUIFillSpendings(self):
         testedDB.Categories.add('a')
         testedDB.Gains.add(['salary', 5000, self.curr_date])
-
         itemToAdd = ['item', 'a', 100, self.curr_date]
+
         for x in itemToAdd:
           if isinstance(x, str):
             x.strip()
+        testedDB.Spendings.add(itemToAdd)
 
         root = Tk()
         app = testedGUI.App(root)
         app.make_page(page=app.page1)
-        app.page1.add(itemToAdd)
+
+        app.page1.fill(testedDB.Spendings.get_all())
         guiDisplay = list(app.page1.listbox.get(0, END))
         root.destroy()
         
