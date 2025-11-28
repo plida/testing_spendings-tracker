@@ -166,9 +166,14 @@ class SpendPage(SecPage):
         self.listbox_data = []
         super().__init__(master, app, SpendDialog, "Траты", db.Spendings)
 
-    def add(self):
-        var_spending = self._dialogue(self.master)
-        result = gui_script.add_spending(var_spending.result, self.app.totalVAR)
+    def add(self, data=[]):
+        if (data):
+            # for integration testing
+            self.app.totalVAR.set(gui_script.calculate_total())
+            result = gui_script.add_spending(data, self.app.totalVAR)
+        else:
+            var_spending = self._dialogue(self.master)
+            result = gui_script.add_spending(var_spending.result, self.app.totalVAR)
         if result == "EXIT":
             return
         elif result == "ERR_future":
@@ -229,9 +234,13 @@ class GainPage(SecPage):
         self.listbox_data = []
         super().__init__(master, app, GainDialog, "Доходы", db.Gains)
 
-    def add(self):
-        var_gain = self._dialogue(self.master)
-        result = gui_script.add_gain(var_gain.result)
+    def add(self, data=[]):
+        if (data):
+            # for integration testing
+            result = gui_script.add_gain(data)
+        else:
+            var_gain = self._dialogue(self.master)
+            result = gui_script.add_gain(var_gain.result)
         if result == "EXIT":
             return
         elif result == "ERR_future":
@@ -289,9 +298,14 @@ class CategPage(SecPage):
         super().__init__(master, app, CategDialog, "Категории", db.Categories)
         self.listbox.config(width=20)
 
-    def add(self):
-        var_category = self._dialogue(self.master)
-        result = gui_script.add_category(var_category.result)
+    def add(self, data=''):
+        if (data):
+            # for integration testing
+            result = gui_script.add_category(data)
+        else:
+            var_category = self._dialogue(self.master)
+            result = gui_script.add_category(var_category.result)
+        
         if result == "ERR_exists":
             messagebox.showinfo("Ошибка (категории)", "Категория уже существует.")
         elif result == "ERR_too_long":
@@ -405,11 +419,16 @@ class GainDialog(tksd.Dialog):
 
 
 class CategDialog(tksd.Dialog):
+    def __init__(self, parent, title = None, value=""):
+        self.initial_value = value
+        super().__init__(parent, title)
+
     def body(self, master):
         Label(master, text="Название:").grid(row=0)
         self.e1 = Entry(master)
         self.e1.grid(row=0, column=1)
         self.e1.config(width=50)
+        self.e1.insert(0, self.initial_value)
         return self.e1  # initial focus
 
     def apply(self):

@@ -17,17 +17,6 @@ class testRemove(unittest.TestCase):
         for table in reversed(meta.sorted_tables):
             session.execute(table.delete())
         session.commit()
-    
-    """
-    def testGUICategoryAdd(self):
-        root = Tk()
-        app = testedGUI.App(root)
-        app.make_page(page=app.page3)
-        dialogue = app.page3._dialogue(app.page3.master)
-        dialogue.e1.insert(0, 'aaa')
-        root.destroy()
-
-        assert 1 == 0"""
 
     def testGUICategoryRemove(self):
         testedDB.Categories.add('1')
