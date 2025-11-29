@@ -6,7 +6,7 @@ from tkinter import *
 import datetime
 import unittest
 
-class testAddition(unittest.TestCase):
+class testItemFill(unittest.TestCase):
     def setUp(self):
         self.curr_date = datetime.date(2025, 11, 26)
         testedDB.initiate("test/integrated/spendings.db")
