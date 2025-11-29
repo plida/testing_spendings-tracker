@@ -169,7 +169,6 @@ class SpendPage(SecPage):
     def add(self, data=[]):
         if (data):
             # for integration testing
-            self.app.totalVAR.set(gui_script.calculate_total())
             result = gui_script.add_spending(data, self.app.totalVAR)
         else:
             var_spending = self._dialogue(self.master)

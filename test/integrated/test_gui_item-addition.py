@@ -1,4 +1,5 @@
 from src.app import db as testDB
+from src.app import gui_script as testedGUIscript
 from tkinter import END
 import datetime
 
@@ -22,7 +23,8 @@ def testGUISpendingsAdd(app, curr_date):
     testDB.Gains.add(['salary', 5000, curr_date])
     itemToAdd = stripWhitespace(['it em', 'a', 500, curr_date])
     app.make_page(page=app.page1)
-
+    app.totalVAR.set(testedGUIscript.calculate_total())
+    
     app.page1.add(itemToAdd)
 
     assert itemToAdd == list(testDB.Spendings.get_all()[0][1:5])
@@ -56,6 +58,7 @@ def testGUIDisplaySpendingsAdd(app, curr_date):
     testDB.Gains.add(['salary', 5000, curr_date])
     itemToAdd = stripWhitespace(['item', 'a', 100, curr_date])
     app.make_page(page=app.page1)
+    app.totalVAR.set(testedGUIscript.calculate_total())
 
     app.page1.add(itemToAdd)
 
